@@ -18,8 +18,8 @@ external release gate is being closed.
 
 ## Decision
 
-1. This repository owns only the Energy Pack, energy composition, commissioning
-   examples, and downstream CI/release metadata.
+1. This repository owns only the Energy Pack, energy composition, EMS operator
+   console, commissioning examples, and downstream CI/release metadata.
 2. Kernel packages, services, extensions, protocol implementations, SHM code,
    and generic CLI code remain exclusively in `EvanL1/AetherIot`.
 3. `distribution/aetheriot-dependency.toml` is the sole AetherIot dependency
@@ -38,9 +38,15 @@ The extraction source was AetherIot integration commit
 working extraction snapshot; the new repository's initial commit is their new
 distribution authority.
 
+The legacy EMS Web UI was subsequently moved intact from the same pinned
+AetherIot source commit into `console/`. Its package identity, CI, and release
+ownership now belong exclusively to AetherEMS.
+
 ## Consequences
 
 - AetherEMS can evolve and release independently without copying Kernel source.
+- The product-specific console evolves with AetherEMS rather than adding a
+  Node/Vue/nginx toolchain to the headless AetherIot kernel.
 - The temporary Git pin is reproducible but is not equivalent to a supported
   AetherIot release.
 - Local development may keep an AetherIot checkout next to this repository, but

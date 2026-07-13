@@ -72,3 +72,38 @@ jobs:
 
       - name: Test processor
         run: uv run pytest
+
+  console:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: console
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: console/pnpm-lock.yaml
+
+      - name: Install locked console dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check console types and lint
+        run: |
+          pnpm run type-check:only
+          pnpm run lint:check
+
+      - name: Test console with coverage
+        run: pnpm run test:coverage
+
+      - name: Build console
+        run: pnpm run build

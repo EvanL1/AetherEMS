@@ -16,13 +16,24 @@ fail() {
     failures=$((failures + 1))
 }
 
-for forbidden in libs services tools extensions integrations examples workspace-hack; do
+for forbidden in apps libs services tools extensions integrations examples workspace-hack; do
     [[ ! -e "$forbidden" ]] || fail "Kernel/integration owner is forbidden: $forbidden"
 done
 
 for forbidden in crates/aether-domain crates/aether-application crates/aether-sdk; do
     [[ ! -e "$forbidden" ]] || fail "copied Aether source is forbidden: $forbidden"
 done
+
+console_root=console
+console_manifest="$console_root/package.json"
+[[ -s "$console_manifest" ]] || fail "AetherEMS console manifest is missing"
+[[ -s "$console_root/pnpm-lock.yaml" ]] || fail "AetherEMS console pnpm lockfile is missing"
+[[ ! -e "$console_root/package-lock.json" ]] \
+    || fail "AetherEMS console must use pnpm as its single package authority"
+if [[ -s "$console_manifest" ]]; then
+    rg -q '"name"[[:space:]]*:[[:space:]]*"aetherems-console"' "$console_manifest" \
+        || fail "AetherEMS console package identity is invalid"
+fi
 
 if rg -n '(^|[,{[:space:]])path[[:space:]]*=' --glob 'Cargo.toml' .; then
     fail "local Cargo path dependencies are forbidden"

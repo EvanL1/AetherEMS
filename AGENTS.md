@@ -6,7 +6,8 @@ downstream of AetherIot.
 ## Ownership boundary
 
 - Energy models, mappings, rules, evaluations, knowledge, commissioning
-  examples, distribution metadata, and energy-domain processors belong here.
+  examples, distribution metadata, the EMS operator console, and energy-domain
+  processors belong here.
 - Generic domain, ports, application, SHM, protocol, service, CLI, and storage
   implementation belongs in `EvanL1/AetherIot`.
 - Do not copy AetherIot packages or source directories into this repository.
@@ -33,7 +34,13 @@ Run:
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets
-cd processors/load-forecasting
+cd console
+corepack pnpm install --frozen-lockfile
+corepack pnpm run type-check:only
+corepack pnpm run lint:check
+corepack pnpm run test:coverage
+corepack pnpm run build
+cd ../processors/load-forecasting
 uv sync --locked --all-groups
 uv run ruff format --check .
 uv run ruff check .
