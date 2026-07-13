@@ -1,0 +1,10 @@
+AetherEMS
+Copyright 2025-2026 AetherEMS contributors
+
+AetherEMS is a downstream energy-management implementation and distribution for
+the AetherIot edge kernel. AetherIot is developed separately at
+https://github.com/EvanL1/AetherIot and
+is subject to its own license and notices.
+
+The names and trademarks of third parties are the property of their respective
+owners and do not imply endorsement of AetherEMS.

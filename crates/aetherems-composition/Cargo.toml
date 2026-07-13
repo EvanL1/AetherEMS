@@ -1,0 +1,25 @@
+[package]
+name = "aetherems-composition"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Fail-safe downstream AetherEMS composition over the Aether edge SDK"
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+aether-sdk.workspace = true
+aether-store-local.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_yml.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+tokio.workspace = true

@@ -1,0 +1,19 @@
+# Extraction provenance
+
+This repository was initialized from the AetherIot integration workspace on
+2026-07-13.
+
+- Source repository: `https://github.com/EvanL1/AetherIot`
+- Source commit: `25a75263da04ea352124814cbf95826f12e63032`
+- Extracted owners: `packs/energy`, `examples/energy-gateway`,
+  `integrations/load-forecasting`, and
+  `distributions/aetherems/runtime-io-features.txt`
+- Excluded owners: AetherIot `.git`, Kernel crates, libraries, services, tools,
+  generic extensions, build output, caches, and deployment data
+
+The composition was rewritten to remove workspace paths and private example or
+runtime-catalog dependencies. The Energy Pack content was copied as one closed
+asset tree. The source working tree contained an unpublished wording correction
+in `packs/energy/knowledge/safe-operations.md` and the untracked runtime feature
+authority; the initial AetherEMS commit is the authority for those downstream
+files.

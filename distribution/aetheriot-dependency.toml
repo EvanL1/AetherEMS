@@ -1,0 +1,10 @@
+schema = "aetherems.aetheriot-dependency.v1"
+mode = "bootstrap-git"
+aetheriot_version = "0.5.0"
+repository = "https://github.com/EvanL1/AetherIot.git"
+commit = "25a75263da04ea352124814cbf95826f12e63032"
+release_evidence_complete = false
+
+# A formal AetherEMS release must replace bootstrap-git with released, set the
+# exact signed CLI/runtime/runtime-manifest assets and SHA-256 values, and make
+# the downstream release-readiness gate pass.

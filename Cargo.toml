@@ -1,0 +1,32 @@
+[workspace]
+resolver = "3"
+members = ["crates/aetherems-composition"]
+default-members = ["crates/aetherems-composition"]
+
+[workspace.package]
+version = "0.5.0"
+edition = "2024"
+rust-version = "1.90"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/EvanL1/AetherIotEMS"
+
+[workspace.dependencies]
+# Bootstrap-only exact Git pins. Replace both entries with exact crates.io
+# versions after Aether publishes the 0.5 release train.
+aether-sdk = { package = "aether-edge-sdk", git = "https://github.com/EvanL1/AetherIot.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
+aether-store-local = { git = "https://github.com/EvanL1/AetherIot.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
+async-trait = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yml = { package = "serde_yaml_ng", version = "0.10" }
+tempfile = "3.8"
+thiserror = "2"
+tokio = { version = "1.35", features = ["full"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+cast-possible-truncation = "allow"
+cast-possible-wrap = "allow"
+cast-sign-loss = "allow"

@@ -1,0 +1,16 @@
+/target/
+/release/
+/.idea/
+/.vscode/
+/.DS_Store
+*.swp
+*.swo
+*.log
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.tar.gz
+*.bundle
