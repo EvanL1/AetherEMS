@@ -93,6 +93,17 @@ export interface MutationConfirmation {
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
+const generateRequestId = (): string | undefined => {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID()
+  if (!globalThis.crypto?.getRandomValues) return undefined
+
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16))
+  bytes[6] = (bytes[6] & 0x0f) | 0x40
+  bytes[8] = (bytes[8] & 0x3f) | 0x80
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+}
+
 /**
  * Build the audit headers for one explicitly confirmed application mutation.
  * Callers must construct this only after the user has submitted or confirmed
@@ -111,7 +122,7 @@ export const confirmedMutationConfig = (
   ) {
     throw new Error('Expected revision must be a non-negative safe integer')
   }
-  const requestId = confirmation.requestId || globalThis.crypto?.randomUUID?.()
+  const requestId = confirmation.requestId || generateRequestId()
   if (!requestId || !UUID_PATTERN.test(requestId)) {
     throw new Error('A valid UUID request ID is required for application mutations')
   }
