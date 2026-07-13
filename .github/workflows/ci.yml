@@ -20,6 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install repository boundary tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ripgrep
+
       - name: Install pinned Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:

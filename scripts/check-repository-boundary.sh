@@ -5,6 +5,11 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+if ! command -v rg >/dev/null 2>&1; then
+    echo "ERROR: ripgrep (rg) is required for repository boundary checks" >&2
+    exit 1
+fi
+
 failures=0
 fail() {
     echo "ERROR: $*" >&2
