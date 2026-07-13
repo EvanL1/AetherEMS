@@ -4,7 +4,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 1
+    # Solo mainline development uses direct reviewed commits; dependency
+    # updates are run manually and Dependabot must not create update PRs.
+    open-pull-requests-limit: 0
     groups:
       cargo-maintenance:
         patterns:
@@ -20,7 +22,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 1
+    open-pull-requests-limit: 0
     groups:
       github-actions-maintenance:
         patterns:
@@ -36,7 +38,7 @@ updates:
     directory: /console
     schedule:
       interval: weekly
-    open-pull-requests-limit: 1
+    open-pull-requests-limit: 0
     groups:
       console-maintenance:
         patterns:
