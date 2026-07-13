@@ -5,17 +5,88 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 dependency_file="$ROOT_DIR/distribution/aetheriot-dependency.toml"
 
-mode=$(sed -n 's/^mode = "\([^"]*\)"$/\1/p' "$dependency_file")
-evidence=$(sed -n 's/^release_evidence_complete = \(.*\)$/\1/p' "$dependency_file")
-
-if [[ "$mode" != released || "$evidence" != true ]]; then
-    echo "AetherEMS release blocked: AetherIot dependency is $mode and signed release evidence is incomplete" >&2
+fail() {
+    echo "AetherEMS release blocked: $*" >&2
     exit 1
+}
+
+quoted() {
+    local key=$1
+    sed -n "s/^${key} = \"\([^\"]*\)\"$/\1/p" "$dependency_file"
+}
+
+require_exact() {
+    local key=$1 expected=$2 actual
+    actual=$(quoted "$key")
+    [[ "$actual" == "$expected" ]] || fail "$key is '$actual', expected '$expected'"
+}
+
+require_sha256() {
+    local key=$1 value
+    value=$(quoted "$key")
+    [[ "$value" =~ ^[0-9a-f]{64}$ ]] || fail "$key is not a lowercase SHA-256"
+}
+
+[[ -s "$dependency_file" ]] || fail "dependency authority is missing"
+require_exact schema aetherems.aetheriot-dependency.v2
+require_exact mode released
+require_exact repository https://github.com/EvanL1/AetherIot.git
+
+version=$(quoted aetheriot_version)
+tag=$(quoted release_tag)
+commit=$(quoted release_commit)
+[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || fail "AetherIot version is not exact semver"
+[[ "$tag" == "v$version" ]] || fail "release tag does not match AetherIot version"
+[[ "$commit" =~ ^[0-9a-f]{40}$ ]] || fail "release commit is not one full Git SHA"
+require_exact release_url "https://github.com/EvanL1/AetherIot/releases/tag/$tag"
+[[ $(sed -n 's/^release_evidence_complete = \(.*\)$/\1/p' "$dependency_file") == true ]] \
+    || fail "signed release evidence is incomplete"
+
+declare -A expected_assets=(
+    [runtime_arm64_asset]="AetherEdge-arm64-$version.run"
+    [runtime_amd64_asset]="AetherEdge-amd64-$version.run"
+    [runtime_manifest_arm64_asset]="aetheriot-runtime-manifest-arm64-$version.json"
+    [runtime_manifest_amd64_asset]="aetheriot-runtime-manifest-amd64-$version.json"
+    [cli_linux_x86_64_asset]="aether-linux-x86_64.tar.gz"
+    [cli_linux_aarch64_asset]="aether-linux-aarch64.tar.gz"
+    [cli_darwin_aarch64_asset]="aether-darwin-aarch64.tar.gz"
+    [cli_windows_x86_64_asset]="aether-windows-x86_64.zip"
+    [provenance_asset]="aetheriot-$tag-provenance.sigstore.json"
+)
+for key in "${!expected_assets[@]}"; do
+    require_exact "$key" "${expected_assets[$key]}"
+done
+
+for key in \
+    crate_aether_edge_sdk_checksum crate_aether_store_local_checksum \
+    runtime_arm64_sha256 runtime_amd64_sha256 \
+    runtime_manifest_arm64_sha256 runtime_manifest_amd64_sha256 \
+    cli_linux_x86_64_sha256 cli_linux_aarch64_sha256 \
+    cli_darwin_aarch64_sha256 cli_windows_x86_64_sha256 \
+    provenance_sha256; do
+    require_sha256 "$key"
+done
+
+if rg -n '(^|[,{[:space:]])(git|path|branch)[[:space:]]*=' --glob 'Cargo.toml' "$ROOT_DIR"; then
+    fail "Cargo manifests retain a non-registry dependency"
+fi
+version_pin_count=$(rg -c "version = \"=$version\"" "$ROOT_DIR/Cargo.toml" || true)
+[[ "$version_pin_count" == 2 ]] || fail "both AetherIot crates must use exact version =$version"
+
+for package in aether-edge-sdk aether-store-local; do
+    awk -v package="$package" -v version="$version" '
+        $0 == "[[package]]" { in_package = 0; found_name = 0; found_version = 0; found_source = 0; found_checksum = 0 }
+        $0 == "name = \"" package "\"" { in_package = 1; found_name = 1 }
+        in_package && $0 == "version = \"" version "\"" { found_version = 1 }
+        in_package && $0 ~ /^source = "registry\+/ { found_source = 1 }
+        in_package && $0 ~ /^checksum = "[0-9a-f]{64}"$/ { found_checksum = 1 }
+        in_package && found_name && found_version && found_source && found_checksum { ok = 1 }
+        END { exit(ok ? 0 : 1) }
+    ' "$ROOT_DIR/Cargo.lock" || fail "$package@$version is not locked to a checksummed registry package"
+done
+
+if [[ ${AETHEREMS_OFFLINE_RELEASE_CHECK:-0} != 1 ]]; then
+    "$ROOT_DIR/scripts/verify-aetheriot-release-evidence.sh"
 fi
 
-if rg -q 'git[[:space:]]*=' "$ROOT_DIR/Cargo.toml"; then
-    echo "AetherEMS release blocked: Git dependencies remain in Cargo.toml" >&2
-    exit 1
-fi
-
-echo "AetherEMS release dependency gate passed"
+echo "AetherEMS release dependency gate passed for AetherIot $tag ($commit)"
