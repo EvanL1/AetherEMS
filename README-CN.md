@@ -1,8 +1,8 @@
 # AetherEMS
 
 AetherEMS 是 [AetherIot](https://github.com/EvanL1/AetherIot) 行业中立 IoT
-边缘内核与 SDK 的官方能源管理实现和发行版。本仓库只拥有 Energy Pack、EMS 组合、
-投运示例与下游一致性验证，不复制或 fork AetherIot Kernel 源码。
+边缘内核与 SDK 的官方能源管理实现和发行版。本仓库拥有 Energy Pack、EMS 组合、可选
+Console、投运示例与下游一致性验证，不复制或 fork AetherIot Kernel 源码。
 
 为保持 API 兼容，上游 Rust crate 与 CLI 当前仍使用 `aether-*` / `aether` 名称；
 `AetherIot` 是仓库和产品名称。
@@ -21,7 +21,13 @@ cargo fmt --all -- --check
 ./scripts/check-repository-boundary.sh
 cargo test --workspace --all-targets --locked
 cargo run --locked -p aetherems-composition
-cd processors/load-forecasting
+cd console
+corepack pnpm install --frozen-lockfile
+corepack pnpm run type-check:only
+corepack pnpm run lint:check
+corepack pnpm run test:coverage
+corepack pnpm run build
+cd ../processors/load-forecasting
 uv sync --locked --all-groups
 uv run ruff format --check .
 uv run ruff check .

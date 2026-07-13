@@ -20,7 +20,7 @@ names for API compatibility; `AetherIot` is the repository and product identity.
 AetherIot release / SDK
         |
         v
-AetherEMS composition + Energy Pack
+AetherEMS composition + Energy Pack + Console
         |
         v
 site commissioning (addresses, credentials, routing, enablement)
@@ -33,6 +33,8 @@ site commissioning (addresses, credentials, routing, enablement)
 - `processors/load-forecasting/` owns the optional energy-domain forecasting
   processor; it is disabled by default and has explicit production cutover
   blockers.
+- `console/` owns the optional AetherEMS operator Web UI. It consumes published
+  AetherIot HTTP contracts and is not part of the AetherIot kernel.
 - `distribution/runtime-io-features.txt` is the feature authority used when
   selecting the compatible AetherIot runtime artifact.
 - `distribution/aetheriot-dependency.toml` is the single AetherIot version/source
@@ -49,7 +51,13 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets
 cargo run -p aetherems-composition
-cd processors/load-forecasting
+cd console
+corepack pnpm install --frozen-lockfile
+corepack pnpm run type-check:only
+corepack pnpm run lint:check
+corepack pnpm run test:coverage
+corepack pnpm run build
+cd ../processors/load-forecasting
 uv sync --locked --all-groups
 uv run ruff format --check .
 uv run ruff check .
