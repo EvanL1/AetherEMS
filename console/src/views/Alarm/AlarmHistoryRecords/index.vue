@@ -165,8 +165,8 @@ const {
   exportData,
   reloadFilters: _reloadFilters,
 } = useTableData<HistoryAlarmData>({
-  listUrl: '/alarmApi/alert-events',
-  exportUrl: '/alarmApi/alert-events/export',
+  listUrl: '/api/v1/alarm/alert-events',
+  exportUrl: '/api/v1/alarm/alert-events/export',
   enableExport: true,
   defaultPageSize: 20,
 })

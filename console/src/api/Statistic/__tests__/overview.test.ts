@@ -26,6 +26,6 @@ describe('api/Statistic/overview.ts', () => {
     const result = await queryPowerTrend(params as any)
 
     expect(result).toEqual(mockData)
-    expect(RequestModule.default.get).toHaveBeenCalledWith('/hisApi/data/query', params)
+    expect(RequestModule.default.get).toHaveBeenCalledWith('/api/v1/history/data/query', params)
   })
 })

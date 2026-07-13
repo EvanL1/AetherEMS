@@ -12,7 +12,7 @@
  */
 
 import { ref, reactive, computed, readonly, toRaw, onMounted } from 'vue'
-import { Request, type ApiResponse } from '@/utils/request'
+import { Request, confirmedMutationConfig, type ApiResponse } from '@/utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 // 分页参数接口
@@ -53,8 +53,8 @@ export interface TableConfig {
 
   // 注意：URL 路径需要包含完整的前缀，如：
   // - 默认服务：/api/v1/users
-  // - 告警服务：/alarmApi/alarms
-  // - 网络服务：/netApi/network
+  // - 告警服务：/api/v1/alarm/alarms
+  // - 网络服务：/api/v1/uplink/network
 }
 
 // 表格数据响应接口
@@ -207,7 +207,10 @@ export function useTableData<T = any>(config: TableConfig) {
           },
         ).then(async () => {
           loading.value = true
-          const response = await Request.delete(deleteUrl)
+          const response = await Request.delete(
+            deleteUrl,
+            confirmedMutationConfig({ confirmed: true }),
+          )
           if (response.success) {
             ElMessage.success('Deleted successfully')
             await fetchTableData()
@@ -247,9 +250,11 @@ export function useTableData<T = any>(config: TableConfig) {
       },
     ).then(async () => {
       loading.value = true
-      const response = await Request.post(config.batchDeleteUrl!, {
-        ids: ids,
-      })
+      const response = await Request.post(
+        config.batchDeleteUrl!,
+        { ids: ids },
+        confirmedMutationConfig({ confirmed: true }),
+      )
 
       if (response.success) {
         ElMessage.success(`成功删除 ${ids.length} 条记录`)

@@ -181,11 +181,12 @@ import type { RuleInfo } from '@/types/ruleManagement'
 
 import { useTableData, type TableConfig } from '@/composables/useTableData'
 import { enableRule, disableRule } from '@/api/alarm'
+import { ElMessageBox } from 'element-plus'
 
 const ruleManagementRef = ref<HTMLElement | null>(null)
 const tableConfig: TableConfig = {
-  listUrl: '/alarmApi/rules',
-  deleteUrl: '/alarmApi/rules/{id}',
+  listUrl: '/api/v1/alarm/rules',
+  deleteUrl: '/api/v1/alarm/rules/{id}',
   defaultPageSize: 20,
 }
 const warningLevelText = {
@@ -265,15 +266,30 @@ const handleDelete = async (row: RuleInfo) => {
   )
 }
 const handleSwitchChange = async (row: RuleInfo) => {
+  const nextEnabled = !row.enabled
+  const confirmed = await ElMessageBox.confirm(
+    `Are you sure you want to ${nextEnabled ? 'enable' : 'disable'} this rule?`,
+    'Rule State Confirmation',
+    {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+      appendTo: ruleManagementRef.value || 'body',
+    },
+  )
+    .then(() => true)
+    .catch(() => false)
+  if (!confirmed) return
+
   switchLoadingId.value = row.id
   try {
-    if (!row.enabled) {
-      const res = await enableRule(row.id)
+    if (nextEnabled) {
+      const res = await enableRule(row.id, { confirmed: true })
       if (res.message) {
         row.enabled = true
       }
     } else {
-      const res = await disableRule(row.id)
+      const res = await disableRule(row.id, { confirmed: true })
       if (res.message) {
         row.enabled = false
       }

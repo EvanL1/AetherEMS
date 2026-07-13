@@ -106,7 +106,7 @@ const levelTextList = {
 const toolbarLeftRef = ref<HTMLElement | null>(null)
 // 表格配置
 const tableConfig: TableConfig = {
-  listUrl: '/alarmApi/alerts',
+  listUrl: '/api/v1/alarm/alerts',
   defaultPageSize: 20,
 }
 

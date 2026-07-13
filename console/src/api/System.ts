@@ -1,34 +1,62 @@
-import { Request } from '@/utils/request'
+import {
+  Request,
+  confirmedMutationConfig,
+  type MutationConfirmation,
+} from '@/utils/request'
 
 export const getMqttConfig = () => {
-  return Request.get('/netApi/mqtt/config')
+  return Request.get('/api/v1/uplink/mqtt/config')
 }
 
-export const updateMqttConfig = (params: any) => {
-  return Request.post('/netApi/mqtt/config', params)
+export const updateMqttConfig = (params: any, confirmation: MutationConfirmation) => {
+  return Request.post(
+    '/api/v1/uplink/mqtt/config',
+    params,
+    confirmedMutationConfig(confirmation),
+  )
 }
 
-export const disconnectMqtt = () => {
-  return Request.post('/netApi/mqtt/disconnect')
+export const disconnectMqtt = (confirmation: MutationConfirmation) => {
+  return Request.post(
+    '/api/v1/uplink/mqtt/disconnect',
+    undefined,
+    confirmedMutationConfig(confirmation),
+  )
 }
 
-export const reconnectMqtt = () => {
-  return Request.post('/netApi/mqtt/reconnect')
+export const reconnectMqtt = (confirmation: MutationConfirmation) => {
+  return Request.post(
+    '/api/v1/uplink/mqtt/reconnect',
+    undefined,
+    confirmedMutationConfig(confirmation),
+  )
 }
 export const getMqttStatus = () => {
-  return Request.get('/netApi/mqtt/status')
+  return Request.get('/api/v1/uplink/mqtt/status')
 }
 
 export type CertificateType = 'ca_cert' | 'client_cert' | 'client_key'
 
 export const getCertificateInfo = () => {
-  return Request.get('/netApi/certificate/info')
+  return Request.get('/api/v1/uplink/certificate/info')
 }
 
-export const uploadCertificate = (certType: CertificateType, file: File) => {
-  return Request.upload('/netApi/certificate/upload', file, { cert_type: certType })
+export const uploadCertificate = (
+  certType: CertificateType,
+  file: File,
+  confirmation: MutationConfirmation,
+) => {
+  return Request.upload(
+    '/api/v1/uplink/certificate/upload',
+    file,
+    { cert_type: certType },
+    confirmedMutationConfig(confirmation),
+  )
 }
 
-export const deleteCertificate = (certType: CertificateType) => {
-  return Request.delete(`/netApi/certificate/${certType}`)
+export const deleteCertificate = (certType: CertificateType, confirmation: MutationConfirmation) => {
+  return Request.delete(
+    `/api/v1/uplink/certificate/${certType}`,
+    confirmedMutationConfig(confirmation),
+  )
 }

@@ -19,6 +19,7 @@ import {
 } from '../channelsManagement'
 
 vi.mock('@/utils/request', () => ({
+  confirmedMutationConfig: vi.fn(() => ({ headers: { 'x-aether-confirmed': 'true' } })),
   Request: {
     get: vi.fn(),
     post: vi.fn(),
@@ -38,15 +39,23 @@ describe('api/channelsManagement.ts', () => {
       .mockResolvedValueOnce({ success: true })
     vi.mocked(Request.get).mockResolvedValueOnce({ success: true, data: { id: 1 } })
 
-    await ChangeChannelEnabled(1, true)
+    await ChangeChannelEnabled(1, true, { confirmed: true })
     await getChannelDetail(1)
-    await updateChannel(1, { name: 'CH-1' } as any)
+    await updateChannel(1, { name: 'CH-1' } as any, { confirmed: true })
 
-    expect(Request.put).toHaveBeenNthCalledWith(1, '/comApi/api/channels/1/enabled', {
-      enabled: true,
-    })
-    expect(Request.get).toHaveBeenCalledWith('/comApi/api/channels/1', null, { timeout: 60000 })
-    expect(Request.put).toHaveBeenNthCalledWith(2, '/comApi/api/channels/1', { name: 'CH-1' })
+    expect(Request.put).toHaveBeenNthCalledWith(
+      1,
+      '/api/v1/io/api/channels/1/enabled',
+      { enabled: true },
+      { headers: { 'x-aether-confirmed': 'true' } },
+    )
+    expect(Request.get).toHaveBeenCalledWith('/api/v1/io/api/channels/1', null, { timeout: 60000 })
+    expect(Request.put).toHaveBeenNthCalledWith(
+      2,
+      '/api/v1/io/api/channels/1',
+      { name: 'CH-1' },
+      { headers: { 'x-aether-confirmed': 'true' } },
+    )
   })
 
   it('creates channels and controls their status', async () => {
@@ -55,13 +64,21 @@ describe('api/channelsManagement.ts', () => {
       .mockResolvedValueOnce({ success: true })
       .mockResolvedValueOnce({ success: true })
 
-    await createChannel({ name: 'CH-2' } as any)
-    await controlChannelStatus(2, 'restart')
+    await createChannel({ name: 'CH-2' } as any, { confirmed: true })
+    await controlChannelStatus(2, 'restart', { confirmed: true })
 
-    expect(Request.post).toHaveBeenNthCalledWith(1, '/comApi/api/channels', { name: 'CH-2' })
-    expect(Request.post).toHaveBeenNthCalledWith(2, '/comApi/api/channels/2/control', {
-      operation: 'restart',
-    })
+    expect(Request.post).toHaveBeenNthCalledWith(
+      1,
+      '/api/v1/io/api/channels',
+      { name: 'CH-2' },
+      { headers: { 'x-aether-confirmed': 'true' } },
+    )
+    expect(Request.post).toHaveBeenNthCalledWith(
+      2,
+      '/api/v1/io/api/channels/2/control',
+      { operation: 'restart' },
+      { headers: { 'x-aether-confirmed': 'true' } },
+    )
   })
 
   it('gets point tables and mapping related resources', async () => {
@@ -79,15 +96,15 @@ describe('api/channelsManagement.ts', () => {
 
     expect(Request.get).toHaveBeenNthCalledWith(
       1,
-      '/comApi/api/channels/3/points',
+      '/api/v1/io/api/channels/3/points',
       { type: 'T' },
       { timeout: 3000 },
     )
-    expect(Request.get).toHaveBeenNthCalledWith(2, '/comApi/api/channels/3/unmapped-points', {
+    expect(Request.get).toHaveBeenNthCalledWith(2, '/api/v1/io/api/channels/3/unmapped-points', {
       type: 'S',
     })
-    expect(Request.get).toHaveBeenNthCalledWith(3, '/comApi/api/channels/3/C/points/9/mapping')
-    expect(Request.get).toHaveBeenNthCalledWith(4, '/comApi/api/channels/3/mappings', null)
+    expect(Request.get).toHaveBeenNthCalledWith(3, '/api/v1/io/api/channels/3/C/points/9/mapping')
+    expect(Request.get).toHaveBeenNthCalledWith(4, '/api/v1/io/api/channels/3/mappings', null)
   })
 
   it('publishes write, control batch, adjustment batch and points batch payloads', async () => {
@@ -104,24 +121,41 @@ describe('api/channelsManagement.ts', () => {
     const mappingPayload = { mappings: [{ point_id: 3, target_id: 4 }] }
     const pointsPayload = { create: [{ id: 5 }], update: [], delete: [] }
 
-    await publishPointValue(8, writePayload as any)
-    await postControlBatch(8, batchPayload)
-    await postAdjustmentBatch(8, batchPayload)
-    await batchUpdateMappingPoint(8, mappingPayload as any)
-    await postPointsBatch(8, pointsPayload as any)
+    await publishPointValue(8, writePayload as any, { confirmed: true })
+    await postControlBatch(8, batchPayload, { confirmed: true })
+    await postAdjustmentBatch(8, batchPayload, { confirmed: true })
+    await batchUpdateMappingPoint(8, mappingPayload as any, { confirmed: true })
+    await postPointsBatch(8, pointsPayload as any, { confirmed: true })
 
-    expect(Request.post).toHaveBeenNthCalledWith(1, '/comApi/api/channels/8/write', writePayload)
-    expect(Request.post).toHaveBeenNthCalledWith(2, '/comApi/api/channels/8/control/batch', {
-      commands: batchPayload,
-    })
-    expect(Request.post).toHaveBeenNthCalledWith(3, '/comApi/api/channels/8/adjustment/batch', {
-      commands: batchPayload,
-    })
-    expect(Request.put).toHaveBeenCalledWith('/comApi/api/channels/8/mappings', mappingPayload)
+    const mutationConfig = { headers: { 'x-aether-confirmed': 'true' } }
+    expect(Request.post).toHaveBeenNthCalledWith(
+      1,
+      '/api/v1/io/api/channels/8/write',
+      writePayload,
+      mutationConfig,
+    )
+    expect(Request.post).toHaveBeenNthCalledWith(
+      2,
+      '/api/v1/io/api/channels/8/control/batch',
+      { commands: batchPayload },
+      mutationConfig,
+    )
+    expect(Request.post).toHaveBeenNthCalledWith(
+      3,
+      '/api/v1/io/api/channels/8/adjustment/batch',
+      { commands: batchPayload },
+      mutationConfig,
+    )
+    expect(Request.put).toHaveBeenCalledWith(
+      '/api/v1/io/api/channels/8/mappings',
+      mappingPayload,
+      mutationConfig,
+    )
     expect(Request.post).toHaveBeenNthCalledWith(
       4,
-      '/comApi/api/channels/8/points/batch',
+      '/api/v1/io/api/channels/8/points/batch',
       pointsPayload,
+      mutationConfig,
     )
   })
 
@@ -132,7 +166,7 @@ describe('api/channelsManagement.ts', () => {
     await getAllChannels()
     const emptyResult = await getChannelsByIds([])
 
-    expect(Request.get).toHaveBeenCalledWith('/comApi/api/channels/list')
+    expect(Request.get).toHaveBeenCalledWith('/api/v1/io/api/channels/list')
     expect(emptyResult).toEqual({ success: true, data: { list: [] } })
   })
 
@@ -145,7 +179,7 @@ describe('api/channelsManagement.ts', () => {
 
     expect(result).toEqual(mockData)
     expect(Request.get).toHaveBeenCalledWith(
-      '/comApi/api/channels/search',
+      '/api/v1/io/api/channels/search',
       { ids: '6,7' },
       { timeout: 5000 },
     )

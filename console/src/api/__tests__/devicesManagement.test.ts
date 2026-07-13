@@ -15,6 +15,7 @@ import {
 } from '../devicesManagement'
 
 vi.mock('@/utils/request', () => ({
+  confirmedMutationConfig: vi.fn(() => ({ headers: { 'x-aether-confirmed': 'true' } })),
   Request: {
     get: vi.fn(),
     post: vi.fn(),
@@ -35,7 +36,7 @@ describe('api/devicesManagement.ts', () => {
     const result = await getInstanceDetail(7)
 
     expect(result).toEqual(mockData)
-    expect(Request.get).toHaveBeenCalledWith('/modApi/api/instances/7')
+    expect(Request.get).toHaveBeenCalledWith('/api/v1/automation/api/instances/7')
   })
 
   it('gets products and all instances', async () => {
@@ -53,8 +54,8 @@ describe('api/devicesManagement.ts', () => {
       data: { list: [{ instance_id: 2 }] },
     })
 
-    expect(Request.get).toHaveBeenNthCalledWith(1, '/modApi/api/products')
-    expect(Request.get).toHaveBeenNthCalledWith(2, '/modApi/api/instances/list')
+    expect(Request.get).toHaveBeenNthCalledWith(1, '/api/v1/automation/api/products')
+    expect(Request.get).toHaveBeenNthCalledWith(2, '/api/v1/automation/api/instances/list')
   })
 
   it('creates and updates an instance', async () => {
@@ -65,11 +66,20 @@ describe('api/devicesManagement.ts', () => {
     const createPayload = { name: 'PCS-1', product_id: 9 }
     const updatePayload = { instance_id: 1, name: 'PCS-1A' }
 
-    await createInstance(createPayload as any)
-    await updateInstance(updatePayload as any)
+    await createInstance(createPayload as any, { confirmed: true })
+    await updateInstance(updatePayload as any, { confirmed: true })
 
-    expect(Request.post).toHaveBeenCalledWith('/modApi/api/instances', createPayload)
-    expect(Request.put).toHaveBeenCalledWith('/modApi/api/instances/1', updatePayload)
+    const mutationConfig = { headers: { 'x-aether-confirmed': 'true' } }
+    expect(Request.post).toHaveBeenCalledWith(
+      '/api/v1/automation/api/instances',
+      createPayload,
+      mutationConfig,
+    )
+    expect(Request.put).toHaveBeenCalledWith(
+      '/api/v1/automation/api/instances/1',
+      updatePayload,
+      mutationConfig,
+    )
   })
 
   it('gets instance points and mappings', async () => {
@@ -81,8 +91,8 @@ describe('api/devicesManagement.ts', () => {
     await getInstancePoints(3)
     await getInstanceMappings(3)
 
-    expect(Request.get).toHaveBeenNthCalledWith(1, '/modApi/api/instances/3/points')
-    expect(Request.get).toHaveBeenNthCalledWith(2, '/modApi/api/instances/3/routing')
+    expect(Request.get).toHaveBeenNthCalledWith(1, '/api/v1/automation/api/instances/3/points')
+    expect(Request.get).toHaveBeenNthCalledWith(2, '/api/v1/automation/api/instances/3/routing')
   })
 
   it('executes action, measurement and mapping updates', async () => {
@@ -101,26 +111,35 @@ describe('api/devicesManagement.ts', () => {
       { channel_id: 1, channel_point_id: 2, four_remote: '遥控', point_id: 3 },
     ]
 
-    await executeAction(5, actionPayload)
-    await executeMeasurement(5, measurementPayload)
-    await updateInstanceMappings(5, mappingsPayload)
-    await updateInstanceRouting(5, routingPayload)
+    await executeAction(5, actionPayload, { confirmed: true })
+    await executeMeasurement(5, measurementPayload, { confirmed: true })
+    await updateInstanceMappings(5, mappingsPayload, { confirmed: true })
+    await updateInstanceRouting(5, routingPayload, { confirmed: true })
 
-    expect(Request.post).toHaveBeenNthCalledWith(1, '/modApi/api/instances/5/action', actionPayload)
+    const mutationConfig = { headers: { 'x-aether-confirmed': 'true' } }
+    expect(Request.post).toHaveBeenNthCalledWith(
+      1,
+      '/api/v1/automation/api/instances/5/action',
+      { ...actionPayload, confirmed: true },
+      mutationConfig,
+    )
     expect(Request.post).toHaveBeenNthCalledWith(
       2,
-      '/modApi/api/instances/5/measurement',
-      measurementPayload,
+      '/api/v1/automation/api/instances/5/measurement',
+      { ...measurementPayload, confirmed: true },
+      mutationConfig,
     )
     expect(Request.put).toHaveBeenNthCalledWith(
       1,
-      '/modApi/api/instances/5/mappings',
-      mappingsPayload,
+      '/api/v1/automation/api/instances/5/mappings',
+      { ...mappingsPayload, confirmed: true },
+      mutationConfig,
     )
     expect(Request.put).toHaveBeenNthCalledWith(
       2,
-      '/ruleApi/api/instances/5/routing',
-      routingPayload,
+      '/api/v1/automation/api/instances/5/routing',
+      routingPayload.map((mapping) => ({ ...mapping, confirmed: true })),
+      mutationConfig,
     )
   })
 
@@ -141,6 +160,6 @@ describe('api/devicesManagement.ts', () => {
     const result = await getInstancesByIds([1, 2, 3])
 
     expect(result).toEqual(mockData)
-    expect(Request.get).toHaveBeenCalledWith('/modApi/api/instances/search', { ids: '1,2,3' })
+    expect(Request.get).toHaveBeenCalledWith('/api/v1/automation/api/instances/search', { ids: '1,2,3' })
   })
 })

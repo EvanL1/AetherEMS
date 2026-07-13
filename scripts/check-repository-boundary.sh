@@ -48,18 +48,40 @@ fi
 
 dependency_file=distribution/aetheriot-dependency.toml
 [[ -s "$dependency_file" ]] || fail "missing $dependency_file"
+mode=$(sed -n 's/^mode = "\([^"]*\)"$/\1/p' "$dependency_file")
+version=$(sed -n 's/^aetheriot_version = "\([^"]*\)"$/\1/p' "$dependency_file")
 commit=$(sed -n 's/^commit = "\([[:xdigit:]]\{40\}\)"$/\1/p' "$dependency_file")
 repository=$(sed -n 's/^repository = "\([^"]*\)"$/\1/p' "$dependency_file")
-[[ ${#commit} -eq 40 ]] || fail "AetherIot dependency commit must be one full SHA-1"
 [[ "$repository" == "https://github.com/EvanL1/AetherIot.git" ]] \
     || fail "unexpected AetherIot repository: $repository"
+[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
+    || fail "AetherIot dependency version is not exact semver: $version"
 
-pin_count=$(rg -c "rev = \"$commit\"" Cargo.toml || true)
-[[ "$pin_count" == 2 ]] \
-    || fail "both AetherIot packages must use the exact recorded commit (found $pin_count)"
-git_dependency_count=$(rg -c 'git = "https://github.com/EvanL1/AetherIot\.git"' Cargo.toml || true)
-[[ "$git_dependency_count" == 2 ]] \
-    || fail "unexpected number of AetherIot Git dependencies: $git_dependency_count"
+case "$mode" in
+    bootstrap-git)
+        [[ ${#commit} -eq 40 ]] \
+            || fail "AetherIot dependency commit must be one full SHA-1"
+        pin_count=$(rg -c "rev = \"$commit\"" Cargo.toml || true)
+        [[ "$pin_count" == 2 ]] \
+            || fail "both AetherIot packages must use the exact recorded commit (found $pin_count)"
+        git_dependency_count=$(rg -c 'git = "https://github.com/EvanL1/AetherIot\.git"' Cargo.toml || true)
+        [[ "$git_dependency_count" == 2 ]] \
+            || fail "unexpected number of AetherIot Git dependencies: $git_dependency_count"
+        ;;
+    released)
+        [[ -z "$commit" ]] \
+            || fail "released AetherIot authority must not retain a bootstrap commit"
+        if rg -n 'git[[:space:]]*=' Cargo.toml; then
+            fail "released AetherIot dependencies must come from crates.io"
+        fi
+        version_pin_count=$(rg -c "version = \"=$version\"" Cargo.toml || true)
+        [[ "$version_pin_count" == 2 ]] \
+            || fail "both AetherIot packages must use exact crates.io version =$version (found $version_pin_count)"
+        ;;
+    *)
+        fail "unsupported AetherIot dependency mode: $mode"
+        ;;
+esac
 [[ -s Cargo.lock ]] || fail "Cargo.lock must be committed for downstream reproducibility"
 
 pack_root=packs/energy

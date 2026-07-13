@@ -28,7 +28,7 @@ read-back verification.
 | `models_instances_action` | `device.write_point` | The local command plane accepted the command |
 | `rules_execute` | `automation.rule.execute` | The rule was evaluated and selected commands were accepted or rejected locally |
 
-(T/S/C/A are the four channel point types — telemetry, signal, control, adjustment; M denotes an instance measurement point — see [Aether Data Model](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/concepts/data-model.md).)
+(T/S/C/A are the four channel point types — telemetry, signal, control, adjustment; M denotes an instance measurement point — see [Aether Data Model](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/concepts/data-model.md).)
 
 `models_instances_action` is the only external point-control tool. It addresses
 a device instance action, which the routing layer resolves to a channel point
@@ -143,7 +143,7 @@ Contrast this with MCP's `readOnlyHint` annotation. In the implementation,
 read-only tools carry no annotation; the 21 write tools are marked
 `annotations(read_only_hint = false)`. The hint is advisory and does not
 replace signed authorization, per-call confirmation, or audit. The generated
-public surface is listed in [Aether MCP Tools Reference](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/reference/mcp-tools.md).
+public surface is listed in [Aether MCP Tools Reference](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/reference/mcp-tools.md).
 
 Tests in `tools/aether/src/mcp.rs` assert the exact 23+21 route counts, verify
 that excluded mutation names remain absent even with `--allow-write`, and
@@ -177,11 +177,11 @@ and explicit confirmation. Rejected, attempted, succeeded, and failed outcomes
 are written to `command_audit_events` in automation's local SQLite database.
 If the mandatory pre-dispatch audit cannot be stored, the command is not sent.
 Redis and PostgreSQL are not involved. See
-[Aether ADR-0008](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/adr/0008-application-control-boundary.md) for the trust boundary.
+[Aether ADR-0008](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/adr/0008-application-control-boundary.md) for the trust boundary.
 
 ## Reading state correctly
 
-Three properties of Aether's data model routinely mislead agents that assume a conventional "device object with a status field" design. Misreading any of them can turn a well-intentioned write into a harmful one. See [Aether Data Model](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/concepts/data-model.md) for the full picture.
+Three properties of Aether's data model routinely mislead agents that assume a conventional "device object with a status field" design. Misreading any of them can turn a well-intentioned write into a harmful one. See [Aether Data Model](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/concepts/data-model.md) for the full picture.
 
 **1. NaN means "temporarily unavailable" — never zero, never "off".** Measurement slots in shared memory initialize to an IEEE-754 quiet NaN sentinel (`SLOT_UNWRITTEN_BITS` in `crates/aether-dataplane/src/core/slot.rs`), the explicit "no data has ever been written here" marker. The source is explicit about why: it "avoids the historical 0.0 ambiguity where a default-initialised slot was indistinguishable from a real device reading of zero." If a battery's power reading is NaN, the battery is not idle and not off — the value is unknown, most likely because the channel has not delivered data yet. Any computation that coerces NaN to 0 (a sum of feeder powers, a state-of-charge average) produces a plausible-looking wrong number. HTTP and MCP readers resolve the same SHM state, so they must preserve that unavailable outcome rather than inventing a value.
 
@@ -203,7 +203,7 @@ An AI agent operating Aether follows these rules verbatim:
 
 ## Related pages
 
-- [Aether System Architecture](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/concepts/architecture.md) — the services these tools talk to
-- [Aether Data Model](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/concepts/data-model.md) — instances, channels, points, and why they are orthogonal
-- [Using Aether with AI Assistants](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/guides/ai-assistants.md) — setting up the MCP server
-- [Aether CLI Reference](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/reference/cli.md) — the `aether` commands behind each tool
+- [Aether System Architecture](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/concepts/architecture.md) — the services these tools talk to
+- [Aether Data Model](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/concepts/data-model.md) — instances, channels, points, and why they are orthogonal
+- [Using Aether with AI Assistants](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/guides/ai-assistants.md) — setting up the MCP server
+- [Aether CLI Reference](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/reference/cli.md) — the `aether` commands behind each tool

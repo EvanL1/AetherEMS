@@ -1,4 +1,8 @@
-import { Request } from '@/utils/request'
+import {
+  Request,
+  confirmedMutationConfig,
+  type MutationConfirmation,
+} from '@/utils/request'
 import type { ApiResponse } from '@/types/user'
 import type {
   DeviceInstanceDetailResponse,
@@ -12,55 +16,81 @@ import type {
 export const getInstanceDetail = (
   instanceId: number,
 ): Promise<ApiResponse<DeviceInstanceDetailResponse>> => {
-  return Request.get(`/modApi/api/instances/${instanceId}`)
+  return Request.get(`/api/v1/automation/api/instances/${instanceId}`)
 }
 /*
 获取产品列表
 */
 export const getProducts = (): Promise<ApiResponse<ProductListResponse>> => {
-  return Request.get('/modApi/api/products')
+  return Request.get('/api/v1/automation/api/products')
 }
-export const createInstance = (data: AddDeviceInstanceDetail) => {
-  return Request.post('/modApi/api/instances', data)
+export const createInstance = (
+  data: AddDeviceInstanceDetail,
+  confirmation: MutationConfirmation,
+) => {
+  return Request.post(
+    '/api/v1/automation/api/instances',
+    data,
+    confirmedMutationConfig(confirmation),
+  )
 }
-export const updateInstance = (data: DeviceInstanceDetail) => {
-  return Request.put(`/modApi/api/instances/${data.instance_id}`, data)
+export const updateInstance = (data: DeviceInstanceDetail, confirmation: MutationConfirmation) => {
+  return Request.put(
+    `/api/v1/automation/api/instances/${data.instance_id}`,
+    data,
+    confirmedMutationConfig(confirmation),
+  )
 }
 /*
 获取设备实例点位
 */
 export const getInstancePoints = (instanceId: number): Promise<ApiResponse<InstancePointList>> => {
-  return Request.get(`/modApi/api/instances/${instanceId}/points`)
+  return Request.get(`/api/v1/automation/api/instances/${instanceId}/points`)
 }
 
 export const executeAction = (
   instanceId: number,
   data: { value: string | number; point_id: string },
+  confirmation: MutationConfirmation,
 ): Promise<ApiResponse<any>> => {
-  return Request.post(`/modApi/api/instances/${instanceId}/action`, data)
+  return Request.post(
+    `/api/v1/automation/api/instances/${instanceId}/action`,
+    { ...data, confirmed: true },
+    confirmedMutationConfig(confirmation),
+  )
 }
 
 /** 下发测量值 */
 export const executeMeasurement = (
   instanceId: number,
   data: { point_id: string; value: number },
+  confirmation: MutationConfirmation,
 ): Promise<ApiResponse<any>> => {
-  return Request.post(`/modApi/api/instances/${instanceId}/measurement`, data)
+  return Request.post(
+    `/api/v1/automation/api/instances/${instanceId}/measurement`,
+    { ...data, confirmed: true },
+    confirmedMutationConfig(confirmation),
+  )
 }
 
 /** 获取设备实例点位映射 */
 export const getInstanceMappings = (
   instanceId: number,
 ): Promise<ApiResponse<InstanceMappingList>> => {
-  return Request.get(`/modApi/api/instances/${instanceId}/routing`)
+  return Request.get(`/api/v1/automation/api/instances/${instanceId}/routing`)
 }
 
 /** 按新结构批量更新设备实例映射 */
 export const updateInstanceMappings = (
   instanceId: number,
   data: { mappings: any[] },
+  confirmation: MutationConfirmation,
 ): Promise<ApiResponse<any>> => {
-  return Request.put(`/modApi/api/instances/${instanceId}/mappings`, data)
+  return Request.put(
+    `/api/v1/automation/api/instances/${instanceId}/mappings`,
+    { ...data, confirmed: true },
+    confirmedMutationConfig(confirmation),
+  )
 }
 
 /** 批量更新设备实例路由（新接口） */
@@ -72,12 +102,17 @@ export const updateInstanceRouting = (
     four_remote: string
     point_id: number
   }>,
+  confirmation: MutationConfirmation,
 ): Promise<ApiResponse<any>> => {
-  return Request.put(`/ruleApi/api/instances/${instanceId}/routing`, data)
+  return Request.put(
+    `/api/v1/automation/api/instances/${instanceId}/routing`,
+    data.map((mapping) => ({ ...mapping, confirmed: true })),
+    confirmedMutationConfig(confirmation),
+  )
 }
 
 export const getAllInstances = () => {
-  return Request.get('/modApi/api/instances/list')
+  return Request.get('/api/v1/automation/api/instances/list')
 }
 
 /** 批量获取实例信息（用于回显优化） */
@@ -86,5 +121,5 @@ export const getInstancesByIds = (ids: number[]) => {
     return Promise.resolve({ success: true, data: { list: [] } })
   }
   const idsParam = ids.join(',')
-  return Request.get(`/modApi/api/instances/search`, { ids: idsParam })
+  return Request.get(`/api/v1/automation/api/instances/search`, { ids: idsParam })
 }

@@ -29,7 +29,7 @@ character set, concurrency range, and exact artifact-bundle JSON shape before
 the Compose override is evaluated.
 
 This preflight does not attest the historian's active write target. Before
-starting `aether-api`, apply any `PUT /hisApi/storage` change with a reconnect
+starting `aether-api`, apply any `PUT /api/v1/history/storage` change with a reconnect
 or `aether-history` restart, verify `active_backend: sqlite`, `connected: true`,
 and a known commissioned sentinel series, then ensure runtime `history.path`
 matches. Persisted `history_config.storage_*` is only saved intent. Keep Data

@@ -9,6 +9,7 @@ import {
 } from '../alarm'
 
 vi.mock('@/utils/request', () => ({
+  confirmedMutationConfig: vi.fn(() => ({ headers: { 'x-aether-confirmed': 'true' } })),
   Request: {
     get: vi.fn(),
     post: vi.fn(),
@@ -32,7 +33,7 @@ describe('Alarm API', () => {
 
     const result = await getRuleDetail('1')
     expect(result).toEqual(mockData)
-    expect(Request.get).toHaveBeenCalledWith('/alarmApi/rules/1')
+    expect(Request.get).toHaveBeenCalledWith('/api/v1/alarm/rules/1')
   })
 
   it('should create rule', async () => {
@@ -46,9 +47,11 @@ describe('Alarm API', () => {
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
     const ruleData = { name: 'new rule', condition: 'test' }
-    const result = await createRule(ruleData)
+    const result = await createRule(ruleData, { confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.post).toHaveBeenCalledWith('/alarmApi/rules', ruleData)
+    expect(Request.post).toHaveBeenCalledWith('/api/v1/alarm/rules', ruleData, {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 
   it('should update rule', async () => {
@@ -62,9 +65,11 @@ describe('Alarm API', () => {
     vi.mocked(Request.put).mockResolvedValue(mockData)
 
     const ruleData = { name: 'updated rule' }
-    const result = await updateRule('1', ruleData)
+    const result = await updateRule('1', ruleData, { confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.put).toHaveBeenCalledWith('/alarmApi/rules/1', ruleData)
+    expect(Request.put).toHaveBeenCalledWith('/api/v1/alarm/rules/1', ruleData, {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 
   it('should delete rule', async () => {
@@ -77,9 +82,11 @@ describe('Alarm API', () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.delete).mockResolvedValue(mockData)
 
-    const result = await deleteRule('1')
+    const result = await deleteRule('1', { confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.delete).toHaveBeenCalledWith('/alarmApi/rules/1')
+    expect(Request.delete).toHaveBeenCalledWith('/api/v1/alarm/rules/1', {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 
   it('should enable rule', async () => {
@@ -92,9 +99,11 @@ describe('Alarm API', () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.patch).mockResolvedValue(mockData)
 
-    const result = await enableRule('1')
+    const result = await enableRule('1', { confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.patch).toHaveBeenCalledWith('/alarmApi/rules/1/enable')
+    expect(Request.patch).toHaveBeenCalledWith('/api/v1/alarm/rules/1/enable', undefined, {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 
   it('should disable rule', async () => {
@@ -107,8 +116,10 @@ describe('Alarm API', () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.patch).mockResolvedValue(mockData)
 
-    const result = await disableRule('1')
+    const result = await disableRule('1', { confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.patch).toHaveBeenCalledWith('/alarmApi/rules/1/disable')
+    expect(Request.patch).toHaveBeenCalledWith('/api/v1/alarm/rules/1/disable', undefined, {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 })

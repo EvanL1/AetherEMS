@@ -227,7 +227,7 @@ inputs:
 
 The production declaration must also include the history length, horizon,
 alignment, missing-data, and freshness fields described in
-[Connect Data Processors](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/guides/data-processors.md).
+[Connect Data Processors](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/guides/data-processors.md).
 
 ## PV forecast task
 
@@ -582,11 +582,11 @@ pass. The presence of its task YAML is not production readiness.
 
 ## Related pages
 
-- [Connect Data Processors](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/guides/data-processors.md) — task declarations and processor adapters
-- [Data Processing Contracts](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/reference/data-processing-contracts.md) — complete request/result and failure semantics
+- [Connect Data Processors](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/guides/data-processors.md) — task declarations and processor adapters
+- [Data Processing Contracts](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/reference/data-processing-contracts.md) — complete request/result and failure semantics
 - [Energy Data Processing Assets](../data-processing/README.md) — disabled load/PV tasks, binding, and conformance fixtures
-- [Load-Forecasting Processor](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/integrations/load-forecasting/README.md) — implemented request-driven compatibility endpoint
-- [HTTP Data Processor](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/extensions/http-data-processor/README.md) — bounded Rust transport adapter
-- [Data Flow](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/concepts/data-flow.md) — current SHM, history, and command paths
+- [Load-Forecasting Processor](../../../processors/load-forecasting/README.md) — implemented request-driven compatibility endpoint
+- [HTTP Data Processor](https://github.com/EvanL1/AetherIot/blob/v0.5.0/extensions/http-data-processor/README.md) — bounded Rust transport adapter
+- [Data Flow](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/concepts/data-flow.md) — current SHM, history, and command paths
 - [Control Strategies](control-strategies.md) — deterministic energy control behavior
 - [Safe Operations for AI Agents](safe-operations.md) — permission and confirmation boundaries

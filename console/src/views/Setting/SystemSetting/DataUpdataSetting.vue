@@ -9,7 +9,7 @@
         label-width="1.35rem"
         label-position="right"
       >
-        <!-- 连接状态来自 GET /netApi/mqtt/status，只读展示 -->
+        <!-- 连接状态来自 GET /api/v1/uplink/mqtt/status，只读展示 -->
 
         <!-- 仅展示 Host、Port 两项（保持原始校验/数据结构不变） -->
         <div class="config-collapse">
@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import DataUploadDialog from './components/DataUploadDialog.vue'
 import { Refresh } from '@element-plus/icons-vue'
 
@@ -105,7 +105,6 @@ const formRef = ref<FormInstance>()
 // 保留简化后的展示，不再使用折叠面板
 
 export interface FormData {
-  alarmsrv_url: string
   broker_host: string
   broker_keepalive_secs: number
   broker_port: number
@@ -227,7 +226,7 @@ const pollUntilConnectedIs = (expected: boolean): Promise<void> => {
 const executeReconnectFlow = async () => {
   try {
     mqttOperationLoading.value = true
-    const response = await reconnectMqtt()
+    const response = await reconnectMqtt({ confirmed: true })
     if (!response.success) {
       mqttOperationLoading.value = false
       ElMessage.error(response.message || 'Reconnect failed')
@@ -244,7 +243,6 @@ const executeReconnectFlow = async () => {
   }
 }
 const formData = ref<FormData>({
-  alarmsrv_url: 'http://localhost:6007',
   broker_host: '127.0.0.1',
   broker_keepalive_secs: 120,
   broker_port: 1883,
@@ -263,7 +261,6 @@ const formData = ref<FormData>({
 })
 const buildMqttConfigPayload = (raw: FormData): FormData => {
   return {
-    alarmsrv_url: raw.alarmsrv_url,
     broker_host: raw.broker_host,
     broker_keepalive_secs: raw.broker_keepalive_secs,
     broker_port: raw.broker_port,
@@ -315,7 +312,9 @@ const handleSubmit = async () => {
   if (!valid) return
   try {
     submitLoading.value = true
-    const res = await updateMqttConfig(buildMqttConfigPayload(toRaw(formData.value)))
+    const res = await updateMqttConfig(buildMqttConfigPayload(toRaw(formData.value)), {
+      confirmed: true,
+    })
     if (!res.success) {
       ElMessage.error(res.message || 'Update failed')
       return
@@ -337,12 +336,37 @@ const getMqttStatusData = async () => {
   await refreshMqttStatus()
 }
 
-const handleReconnectClick = () => executeReconnectFlow()
+const handleReconnectClick = async () => {
+  const confirmed = await ElMessageBox.confirm(
+    'Reconnect the MQTT uplink now?',
+    'MQTT Reconnect Confirmation',
+    {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    },
+  )
+    .then(() => true)
+    .catch(() => false)
+  if (confirmed) await executeReconnectFlow()
+}
 
 const handleDisconnectClick = async () => {
+  const confirmed = await ElMessageBox.confirm(
+    'Disconnect the MQTT uplink and suspend automatic reconnection?',
+    'MQTT Disconnect Confirmation',
+    {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    },
+  )
+    .then(() => true)
+    .catch(() => false)
+  if (!confirmed) return
   try {
     mqttOperationLoading.value = true
-    const response = await disconnectMqtt()
+    const response = await disconnectMqtt({ confirmed: true })
     if (!response.success) {
       mqttOperationLoading.value = false
       ElMessage.error(response.message || 'Disconnect failed')

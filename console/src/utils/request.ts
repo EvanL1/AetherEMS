@@ -84,6 +84,54 @@ export interface RequestConfig extends AxiosRequestConfig {
   _isRefreshTokenRequest?: boolean // 是否为刷新token请求（内部使用，避免重复刷新）
 }
 
+export interface MutationConfirmation {
+  confirmed: true
+  expectedRevision?: number
+  requestId?: string
+}
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+/**
+ * Build the audit headers for one explicitly confirmed application mutation.
+ * Callers must construct this only after the user has submitted or confirmed
+ * the operation; read paths must not use it.
+ */
+export const confirmedMutationConfig = (
+  confirmation: MutationConfirmation,
+  config: RequestConfig = {},
+): RequestConfig => {
+  if (confirmation.confirmed !== true) {
+    throw new Error('Application mutations require explicit confirmation')
+  }
+  if (
+    confirmation.expectedRevision !== undefined &&
+    (!Number.isSafeInteger(confirmation.expectedRevision) || confirmation.expectedRevision < 0)
+  ) {
+    throw new Error('Expected revision must be a non-negative safe integer')
+  }
+  const requestId = confirmation.requestId || globalThis.crypto?.randomUUID?.()
+  if (!requestId || !UUID_PATTERN.test(requestId)) {
+    throw new Error('A valid UUID request ID is required for application mutations')
+  }
+
+  const headers: Record<string, string> = {
+    'x-aether-confirmed': 'true',
+    'x-request-id': requestId,
+  }
+  if (confirmation.expectedRevision !== undefined) {
+    headers['x-aether-expected-revision'] = String(confirmation.expectedRevision)
+  }
+  return {
+    ...config,
+    headers: {
+      ...config.headers,
+      ...headers,
+    },
+  }
+}
+
 /**
  * 创建统一的axios实例
  * 设置基础配置项
@@ -108,8 +156,8 @@ const requestInterceptor = (config: any) => {
   // 添加时间戳防止缓存 (GET请求) - 在生成 key 之前添加，但 normalizeForKey 会过滤掉 _t
   if (
     config.method?.toLowerCase() === 'get' &&
-    config.url !== '/modApi/api/instances/search' &&
-    config.url !== '/comApi/api/channels/search'
+    config.url !== '/api/v1/automation/api/instances/search' &&
+    config.url !== '/api/v1/io/api/channels/search'
   ) {
     config.params = {
       ...config.params,
@@ -437,7 +485,7 @@ service.interceptors.response.use(...createResponseInterceptor(service))
 class Request {
   /**
    * GET请求
-   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /alarmApi/alarms）
+   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /api/v1/alarm/alarms）
    * @param params 请求参数
    * @param config 请求配置
    */
@@ -452,7 +500,7 @@ class Request {
 
   /**
    * POST请求
-   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /alarmApi/alarms）
+   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /api/v1/alarm/alarms）
    * @param data 请求数据
    * @param config 请求配置
    */
@@ -467,7 +515,7 @@ class Request {
 
   /**
    * PUT请求
-   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /alarmApi/alarms）
+   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /api/v1/alarm/alarms）
    * @param data 请求数据
    * @param config 请求配置
    */
@@ -482,7 +530,7 @@ class Request {
 
   /**
    * DELETE请求
-   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /alarmApi/alarms）
+   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /api/v1/alarm/alarms）
    * @param config 请求配置
    */
   static async delete<T = any>(url: string, config?: RequestConfig): Promise<ApiResponse<T>> {
@@ -492,7 +540,7 @@ class Request {
 
   /**
    * PATCH请求
-   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /alarmApi/alarms）
+   * @param url 请求地址（已包含完整路径，如 /api/v1/users 或 /api/v1/alarm/alarms）
    * @param data 请求数据
    * @param config 请求配置
    */
@@ -507,7 +555,7 @@ class Request {
 
   /**
    * 文件上传
-   * @param url 上传地址（已包含完整路径，如 /api/v1/upload 或 /alarmApi/upload）
+   * @param url 上传地址（已包含完整路径，如 /api/v1/upload 或 /api/v1/alarm/upload）
    * @param file 文件对象
    * @param data 额外数据
    * @param config 请求配置
@@ -531,6 +579,7 @@ class Request {
     const response = await service.post(url, formData, {
       ...config,
       headers: {
+        ...config?.headers,
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -539,7 +588,7 @@ class Request {
 
   /**
    * 下载文件
-   * @param url 下载地址（已包含完整路径，如 /api/v1/export 或 /alarmApi/export）
+   * @param url 下载地址（已包含完整路径，如 /api/v1/export 或 /api/v1/alarm/export）
    * @param params 请求参数
    * @param filename 文件名
    */

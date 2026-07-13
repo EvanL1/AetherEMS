@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useTableData, type TableConfig } from '../useTableData'
 
 vi.mock('@/utils/request', () => ({
+  confirmedMutationConfig: vi.fn(() => ({ headers: { 'x-aether-confirmed': 'true' } })),
   Request: {
     get: vi.fn(),
     post: vi.fn(),
@@ -166,7 +167,9 @@ describe('useTableData', () => {
 
     expect(result).toBe(false)
     expect(ElMessageBox.confirm).toHaveBeenCalled()
-    expect(Request.delete).toHaveBeenCalledWith('/test/delete/1')
+    expect(Request.delete).toHaveBeenCalledWith('/test/delete/1', {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
 
     wrapper.unmount()
   })
@@ -303,7 +306,11 @@ describe('useTableData', () => {
     await api.fetchTableData()
 
     await api.batchDeleteRows([1, '2'])
-    expect(Request.post).toHaveBeenCalledWith('/test/batch-delete', { ids: [1, '2'] })
+    expect(Request.post).toHaveBeenCalledWith(
+      '/test/batch-delete',
+      { ids: [1, '2'] },
+      { headers: { 'x-aether-confirmed': 'true' } },
+    )
     expect(ElMessage.success).toHaveBeenCalledWith('成功删除 2 条记录')
 
     await expect(api.exportData('records.xlsx', { format: 'xlsx' })).resolves.toBe(true)

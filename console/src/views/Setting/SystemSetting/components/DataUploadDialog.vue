@@ -62,9 +62,6 @@
               placeholder="Enter keepalive seconds"
             />
           </el-form-item>
-          <el-form-item label="AlarmSrv URL:" prop="alarmsrv_url">
-            <el-input v-model="formData.alarmsrv_url" placeholder="Enter alarmsrv url" />
-          </el-form-item>
         </div>
 
         <!-- 3. Reconnect & reporting -->
@@ -174,7 +171,6 @@ import type { FormData } from '../DataUpdataSetting.vue'
 import TlsCertificateDialog from './TlsCertificateDialog.vue'
 
 const formData = ref<FormData>({
-  alarmsrv_url: 'http://localhost:6007',
   broker_host: '127.0.0.1',
   broker_keepalive_secs: 120,
   broker_port: 1883,
@@ -207,7 +203,6 @@ const rules = ref<FormRules<FormData>>({
     { min: 1, max: 50, message: 'Client ID length should be 1-50 characters', trigger: 'blur' },
   ],
   broker_host: [{ required: true, message: 'Please enter host address', trigger: 'blur' }],
-  alarmsrv_url: [{ required: true, message: 'Please enter alarmsrv url', trigger: 'blur' }],
   broker_keepalive_secs: [
     { required: true, message: 'Please enter keepalive seconds', trigger: 'blur' },
   ],
@@ -319,7 +314,6 @@ const submitDialog = async () => {
     const raw = toRaw(formData.value)
     // 仅透传 MQTT 配置字段，避免提交历史证书相关字段。
     const params: FormData = {
-      alarmsrv_url: raw.alarmsrv_url,
       broker_host: raw.broker_host,
       broker_keepalive_secs: raw.broker_keepalive_secs,
       broker_port: raw.broker_port,
@@ -339,7 +333,7 @@ const submitDialog = async () => {
     params.subscribe_patterns = subscribePatterns
     params.exclude_patterns = excludePatterns
 
-    const res = await updateMqttConfig(params)
+    const res = await updateMqttConfig(params, { confirmed: true })
     if (res.success) {
       ElMessage.success('Update success')
       close()

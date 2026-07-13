@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import type { UploadFile } from 'element-plus'
+import { ElMessageBox, type UploadFile } from 'element-plus'
 import {
   deleteCertificate,
   getCertificateInfo,
@@ -158,9 +158,21 @@ const handleUpload = async (certType: CertificateType, uploadFile: UploadFile) =
     ElMessage.warning(message)
     return
   }
+  const confirmed = await ElMessageBox.confirm(
+    `Replace the ${item?.label || certType} used by the MQTT uplink?`,
+    'Certificate Upload Confirmation',
+    {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    },
+  )
+    .then(() => true)
+    .catch(() => false)
+  if (!confirmed) return
   try {
     uploadingType.value = certType
-    const res = await uploadCertificate(certType, rawFile as File)
+    const res = await uploadCertificate(certType, rawFile as File, { confirmed: true })
     if (res.success) {
       ElMessage.success(res.message || 'Certificate uploaded successfully')
       await fetchInfo()
@@ -177,9 +189,22 @@ const handleUploadChange = (certType: CertificateType) => {
 }
 
 const handleDelete = async (certType: CertificateType) => {
+  const item = certItems.find((candidate) => candidate.type === certType)
+  const confirmed = await ElMessageBox.confirm(
+    `Delete the ${item?.label || certType} from the MQTT uplink?`,
+    'Certificate Delete Confirmation',
+    {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    },
+  )
+    .then(() => true)
+    .catch(() => false)
+  if (!confirmed) return
   try {
     deletingType.value = certType
-    const res = await deleteCertificate(certType)
+    const res = await deleteCertificate(certType, { confirmed: true })
     if (res.success) {
       ElMessage.success(res.message || 'Certificate deleted successfully')
       await fetchInfo()

@@ -216,7 +216,7 @@ production. The pinned upstream future-covariate off-by-one must be fixed with
 a golden step-to-row test, verbose sensitive output removed, actual artifact
 files resolved and pinned, upstream licensing cleared, and a real artifact
 benchmarked below the frame-and-processor work deadline at target-hardware p95. See the
-[`integrations/load-forecasting` readiness gates](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/integrations/load-forecasting/README.md#production-cutover-blockers).
+[`processors/load-forecasting` readiness gates](../../../processors/load-forecasting/README.md#production-cutover-blockers).
 
 Processor loss or network failure must leave acquisition, SHM, history,
 alarms, deterministic rules, and device control available.
@@ -232,4 +232,4 @@ ruby -e 'require "json"; Dir["packs/energy/data-processing/**/*.json"].sort.each
 ```
 
 The normative wire rules are documented in
-[Aether Data Processing contracts](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/reference/data-processing-contracts.md).
+[Aether Data Processing contracts](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/reference/data-processing-contracts.md).

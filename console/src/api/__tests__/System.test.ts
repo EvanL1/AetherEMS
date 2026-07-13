@@ -8,6 +8,7 @@ import {
 } from '../System'
 
 vi.mock('@/utils/request', () => ({
+  confirmedMutationConfig: vi.fn(() => ({ headers: { 'x-aether-confirmed': 'true' } })),
   Request: {
     get: vi.fn(),
     post: vi.fn(),
@@ -22,7 +23,7 @@ describe('System API', () => {
 
     const result = await getMqttConfig()
     expect(result).toEqual(mockData)
-    expect(Request.get).toHaveBeenCalledWith('/netApi/mqtt/config')
+    expect(Request.get).toHaveBeenCalledWith('/api/v1/uplink/mqtt/config')
   })
 
   it('should update MQTT config', async () => {
@@ -31,9 +32,11 @@ describe('System API', () => {
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
     const config = { mqtt_connection: { broker: {} } }
-    const result = await updateMqttConfig(config)
+    const result = await updateMqttConfig(config, { confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.post).toHaveBeenCalledWith('/netApi/mqtt/config', config)
+    expect(Request.post).toHaveBeenCalledWith('/api/v1/uplink/mqtt/config', config, {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 
   it('should disconnect MQTT', async () => {
@@ -41,9 +44,11 @@ describe('System API', () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
-    const result = await disconnectMqtt()
+    const result = await disconnectMqtt({ confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.post).toHaveBeenCalledWith('/netApi/mqtt/disconnect')
+    expect(Request.post).toHaveBeenCalledWith('/api/v1/uplink/mqtt/disconnect', undefined, {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 
   it('should reconnect MQTT', async () => {
@@ -51,9 +56,11 @@ describe('System API', () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
-    const result = await reconnectMqtt()
+    const result = await reconnectMqtt({ confirmed: true })
     expect(result).toEqual(mockData)
-    expect(Request.post).toHaveBeenCalledWith('/netApi/mqtt/reconnect')
+    expect(Request.post).toHaveBeenCalledWith('/api/v1/uplink/mqtt/reconnect', undefined, {
+      headers: { 'x-aether-confirmed': 'true' },
+    })
   })
 
   it('should get MQTT status', async () => {
@@ -63,6 +70,6 @@ describe('System API', () => {
 
     const result = await getMqttStatus()
     expect(result).toEqual(mockData)
-    expect(Request.get).toHaveBeenCalledWith('/netApi/mqtt/status')
+    expect(Request.get).toHaveBeenCalledWith('/api/v1/uplink/mqtt/status')
   })
 })

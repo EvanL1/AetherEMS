@@ -63,13 +63,13 @@ export interface DialogExpose {
   dialogVisible: boolean
 }
 
-// GET /alarmApi/rules 列表响应
+// GET /api/v1/alarm/rules 列表响应
 export interface RuleResponse {
   list: RuleInfo[]
   total: number
 }
 
-// GET /alarmApi/rules/{id} 单条规则响应
+// GET /api/v1/alarm/rules/{id} 单条规则响应
 export interface RuleDetailResponse {
   list: RuleInfo[]
   total: number

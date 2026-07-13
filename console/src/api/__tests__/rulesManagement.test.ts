@@ -20,6 +20,7 @@ vi.mock('@/utils/request', () => {
   return {
     default: Request,
     Request,
+    confirmedMutationConfig: vi.fn(() => ({ headers: { 'x-aether-confirmed': 'true' } })),
   }
 })
 
@@ -37,8 +38,8 @@ describe('api/rulesManagement.ts', () => {
     await listRules()
     await getRuleDetail('rule-1')
 
-    expect(RequestModule.default.get).toHaveBeenNthCalledWith(1, '/ruleApi/api/rules')
-    expect(RequestModule.default.get).toHaveBeenNthCalledWith(2, '/ruleApi/api/rules/rule-1')
+    expect(RequestModule.default.get).toHaveBeenNthCalledWith(1, '/api/v1/automation/api/rules')
+    expect(RequestModule.default.get).toHaveBeenNthCalledWith(2, '/api/v1/automation/api/rules/rule-1')
   })
 
   it('creates, updates and deletes rules', async () => {
@@ -50,20 +51,26 @@ describe('api/rulesManagement.ts', () => {
     const createPayload = { name: 'Rule A', description: 'desc' }
     const updatePayload = { id: 'rule-1', name: 'Rule B', description: 'updated' }
 
-    await createRule(createPayload as any)
-    await updateRule(updatePayload as any)
-    await deleteRule('rule-1')
+    await createRule(createPayload as any, { confirmed: true })
+    await updateRule(updatePayload as any, { confirmed: true })
+    await deleteRule('rule-1', { confirmed: true })
 
+    const mutationConfig = { headers: { 'x-aether-confirmed': 'true' } }
     expect(RequestModule.default.post).toHaveBeenNthCalledWith(
       1,
-      '/ruleApi/api/rules',
-      createPayload,
+      '/api/v1/automation/api/rules',
+      { ...createPayload, confirmed: true },
+      mutationConfig,
     )
     expect(RequestModule.default.put).toHaveBeenCalledWith(
-      '/ruleApi/api/rules/rule-1',
-      updatePayload,
+      '/api/v1/automation/api/rules/rule-1',
+      { ...updatePayload, confirmed: true },
+      mutationConfig,
     )
-    expect(RequestModule.default.delete).toHaveBeenCalledWith('/ruleApi/api/rules/rule-1')
+    expect(RequestModule.default.delete).toHaveBeenCalledWith(
+      '/api/v1/automation/api/rules/rule-1',
+      mutationConfig,
+    )
   })
 
   it('enables, disables and submits rule chains', async () => {
@@ -80,22 +87,28 @@ describe('api/rulesManagement.ts', () => {
       flow_json: { nodes: [], edges: [] },
     }
 
-    await enableRule('rule-2')
-    await disableRule('rule-2')
-    await submitRuleChain(chainPayload as any)
+    await enableRule('rule-2', { confirmed: true })
+    await disableRule('rule-2', { confirmed: true })
+    await submitRuleChain(chainPayload as any, { confirmed: true })
 
+    const mutationConfig = { headers: { 'x-aether-confirmed': 'true' } }
     expect(RequestModule.default.post).toHaveBeenNthCalledWith(
       1,
-      '/ruleApi/api/rules/rule-2/enable',
+      '/api/v1/automation/api/rules/rule-2/enable',
+      { confirmed: true },
+      mutationConfig,
     )
     expect(RequestModule.default.post).toHaveBeenNthCalledWith(
       2,
-      '/ruleApi/api/rules/rule-2/disable',
+      '/api/v1/automation/api/rules/rule-2/disable',
+      { confirmed: true },
+      mutationConfig,
     )
     expect(RequestModule.default.post).toHaveBeenNthCalledWith(
       3,
-      '/ruleApi/api/rules',
-      chainPayload,
+      '/api/v1/automation/api/rules',
+      { ...chainPayload, confirmed: true },
+      mutationConfig,
     )
   })
 })

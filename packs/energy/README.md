@@ -80,5 +80,5 @@ the existing service are documented in
 [Power Forecasting](knowledge/power-forecasting.md). Installing this
 pack never starts a model or contacts a remote processor by itself. The
 opt-in implementations are the bounded
-[HTTP adapter](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/extensions/http-data-processor/README.md) and
-[Load-Forecasting processor](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/integrations/load-forecasting/README.md).
+[HTTP adapter](https://github.com/EvanL1/AetherIot/blob/v0.5.0/extensions/http-data-processor/README.md) and
+[Load-Forecasting processor](../../processors/load-forecasting/README.md).

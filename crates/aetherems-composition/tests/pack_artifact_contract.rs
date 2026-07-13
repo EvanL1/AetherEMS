@@ -197,6 +197,19 @@ fn energy_pack_loads_after_copying_only_the_pack_artifact() {
 fn formal_energy_assets_retain_versioned_fail_safe_payloads() {
     let root = repository_pack_root();
 
+    let io = yaml_value(&root.join("examples/config/io/io.yaml"));
+    assert!(
+        io["channels"]
+            .as_array()
+            .is_some_and(|channels| !channels.is_empty()
+                && channels.iter().all(|channel| channel["enabled"] == false))
+    );
+    let automation = yaml_value(&root.join("examples/config/automation/automation.yaml"));
+    assert_eq!(automation["auto_load_instances"], false);
+    let instance =
+        yaml_value(&root.join("examples/config/automation/instances/diesel_gen_01/instance.yaml"));
+    assert_eq!(instance["instance"]["enabled"], false);
+
     let aliases = yaml_value(&root.join("mappings/product-name-aliases.yaml"));
     assert_eq!(aliases["schema"], "aether.pack.mapping-set.v1");
     assert_eq!(aliases["kind"], "product_aliases");

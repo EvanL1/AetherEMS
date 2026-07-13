@@ -619,7 +619,7 @@ async function onSubmit() {
     // 确保 service_type 固定为 comsrv
     const submitData = { ...form.value, service_type: 'comsrv', trigger_config }
     if (mode.value === 'create') {
-      const res = await createRule(submitData)
+      const res = await createRule(submitData, { confirmed: true })
       if (res.success) {
         emit('submit', form.value)
         close()
@@ -630,7 +630,7 @@ async function onSubmit() {
       if (!rules_id.value) {
         throw new Error('rules_id is required')
       }
-      const res = await updateRule(rules_id.value, submitData)
+      const res = await updateRule(rules_id.value, submitData, { confirmed: true })
       if (res.success) {
         emit('submit', form.value)
         close()

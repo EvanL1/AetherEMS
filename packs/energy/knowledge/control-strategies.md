@@ -17,7 +17,7 @@ rebuilding or restarting anything.
 A rule is stored in two columns that are always produced together: `flow_json`
 (the full visual-editor graph, including layout) and `nodes_json` (the compact
 execution topology the engine actually runs). See
-[Aether Rule Engine](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/concepts/rule-engine.md) for how the parser, scheduler, and
+[Aether Rule Engine](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/concepts/rule-engine.md) for how the parser, scheduler, and
 executor fit together.
 
 Rules fire in one of two ways:
@@ -204,5 +204,5 @@ What a strategy author can rely on:
   actions the conditions select are dispatched through shared memory to io
   and on to the device. There is no test or dry-run endpoint. Trial a
   new strategy against a Virtual-protocol channel first (see
-  [Connect Devices](https://github.com/EvanL1/AetherIot/blob/25a75263da04ea352124814cbf95826f12e63032/docs/guides/connect-devices.md)) before pointing it at
+  [Connect Devices](https://github.com/EvanL1/AetherIot/blob/v0.5.0/docs/guides/connect-devices.md)) before pointing it at
   real hardware.
