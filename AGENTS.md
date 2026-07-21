@@ -1,7 +1,7 @@
 # AetherEMS Agent Instructions
 
 This repository is the energy-management implementation and distribution
-downstream of AetherIot.
+downstream of AetherEdge.
 
 ## Ownership boundary
 
@@ -9,9 +9,9 @@ downstream of AetherIot.
   examples, distribution metadata, the EMS operator console, and energy-domain
   processors belong here.
 - Generic domain, ports, application, SHM, protocol, service, CLI, and storage
-  implementation belongs in `EvanL1/AetherIot`.
-- Do not copy AetherIot packages or source directories into this repository.
-- Cargo dependencies on AetherIot must use the single authority in
+  implementation belongs in `EvanL1/AetherEdge`.
+- Do not copy AetherEdge packages or source directories into this repository.
+- Cargo dependencies on AetherEdge must use the single authority in
   `distribution/aetheriot-dependency.toml`; committed local `path` overrides are
   forbidden.
 
@@ -23,7 +23,7 @@ downstream of AetherIot.
 - Site addresses, credentials, certificates, customer data, and production
   memory/database images must never be committed.
 - Device control remains deny-by-default, confirmed, permission checked, and
-  audited by AetherIot.
+  audited by AetherEdge.
 
 ## Verification
 

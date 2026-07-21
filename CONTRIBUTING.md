@@ -1,7 +1,7 @@
 # Contributing
 
 Contributions must stay inside the AetherEMS distribution boundary. Generic
-kernel or protocol changes belong in the upstream AetherIot repository.
+kernel or protocol changes belong in the upstream AetherEdge repository.
 
 Before committing and pushing to `main`, run:
 
@@ -24,5 +24,5 @@ uv run pytest
 ```
 
 Never commit production credentials, customer data, commissioned addresses, or
-enabled control examples. Record changes to the AetherIot dependency contract or
+enabled control examples. Record changes to the AetherEdge dependency contract or
 Pack authority as an ADR.

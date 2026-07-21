@@ -30,15 +30,15 @@ require_sha256() {
 [[ -s "$dependency_file" ]] || fail "dependency authority is missing"
 require_exact schema aetherems.aetheriot-dependency.v2
 require_exact mode released
-require_exact repository https://github.com/EvanL1/AetherIot.git
+require_exact repository https://github.com/EvanL1/AetherEdge.git
 
 version=$(quoted aetheriot_version)
 tag=$(quoted release_tag)
 commit=$(quoted release_commit)
-[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || fail "AetherIot version is not exact semver"
-[[ "$tag" == "v$version" ]] || fail "release tag does not match AetherIot version"
+[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || fail "AetherEdge version is not exact semver"
+[[ "$tag" == "v$version" ]] || fail "release tag does not match AetherEdge version"
 [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || fail "release commit is not one full Git SHA"
-require_exact release_url "https://github.com/EvanL1/AetherIot/releases/tag/$tag"
+require_exact release_url "https://github.com/EvanL1/AetherEdge/releases/tag/$tag"
 [[ $(sed -n 's/^release_evidence_complete = \(.*\)$/\1/p' "$dependency_file") == true ]] \
     || fail "signed release evidence is incomplete"
 
@@ -71,7 +71,7 @@ if rg -n '(^|[,{[:space:]])(git|path|branch)[[:space:]]*=' --glob 'Cargo.toml' "
     fail "Cargo manifests retain a non-registry dependency"
 fi
 version_pin_count=$(rg -c "version = \"=$version\"" "$ROOT_DIR/Cargo.toml" || true)
-[[ "$version_pin_count" == 2 ]] || fail "both AetherIot crates must use exact version =$version"
+[[ "$version_pin_count" == 2 ]] || fail "both AetherEdge crates must use exact version =$version"
 
 for package in aether-edge-sdk aether-store-local; do
     awk -v package="$package" -v version="$version" '
@@ -89,4 +89,4 @@ if [[ ${AETHEREMS_OFFLINE_RELEASE_CHECK:-0} != 1 ]]; then
     "$ROOT_DIR/scripts/verify-aetheriot-release-evidence.sh"
 fi
 
-echo "AetherEMS release dependency gate passed for AetherIot $tag ($commit)"
+echo "AetherEMS release dependency gate passed for AetherEdge $tag ($commit)"

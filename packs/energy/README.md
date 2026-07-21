@@ -2,7 +2,7 @@
 
 The energy pack is the domain layer of the AetherEMS distribution. It is the
 migration destination for energy product models, mappings, control strategies,
-and operational knowledge; it is not a dependency of the Aether kernel.
+and operational knowledge; it is not a dependency of the AetherEdge kernel.
 
 The v1 manifest is validated by the industry-neutral `aether-pack` boundary and
 contains only pack-root-relative asset directories. Product models under
@@ -80,5 +80,5 @@ the existing service are documented in
 [Power Forecasting](knowledge/power-forecasting.md). Installing this
 pack never starts a model or contacts a remote processor by itself. The
 opt-in implementations are the bounded
-[HTTP adapter](https://github.com/EvanL1/AetherIot/blob/v0.5.0/extensions/http-data-processor/README.md) and
+[HTTP adapter](https://github.com/EvanL1/AetherEdge/blob/v0.5.0/extensions/http-data-processor/README.md) and
 [Load-Forecasting processor](../../processors/load-forecasting/README.md).
