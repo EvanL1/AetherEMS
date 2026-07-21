@@ -1,7 +1,8 @@
 # AetherEMS Agent Instructions
 
 This repository is the energy-management implementation and distribution
-downstream of AetherEdge.
+downstream of AetherEdge. `CLAUDE.md` and `GEMINI.md` are symlinks to this
+file, so every agent reads and edits the same instructions.
 
 ## Ownership boundary
 
