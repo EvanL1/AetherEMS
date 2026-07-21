@@ -14,24 +14,7 @@ Console、投运示例与下游一致性验证，不复制或 fork AetherIot Ker
 已签名 AetherIot Runtime + 已验证 Energy Pack + 现场投运 = AetherEMS
 ```
 
-本地验证：
-
-```bash
-cargo fmt --all -- --check
-./scripts/check-repository-boundary.sh
-cargo test --workspace --all-targets --locked
-cargo run --locked -p aetherems-composition
-cd console
-corepack pnpm install --frozen-lockfile
-corepack pnpm run type-check:only
-corepack pnpm run lint:check
-corepack pnpm run test:coverage
-corepack pnpm run build
-cd ../processors/load-forecasting
-uv sync --locked --all-groups
-uv run ruff format --check .
-uv run ruff check .
-uv run pytest
-```
+仓库检查以及内部 Console、Processor 构建方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。这些是
+贡献者工作流，不是 AetherEMS 产品安装入口。
 
 所有随包 channel、规则、任务和 binding 默认禁用；Pack 安装本身不会连接设备或执行控制。

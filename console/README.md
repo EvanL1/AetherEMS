@@ -31,7 +31,8 @@ or internal process port returns.
 
 ## Local development
 
-Requirements: Node.js 20+ and Corepack.
+Requirements: Node.js 22.13+ in the Node 22 LTS line and Corepack. pnpm is an internal Console build
+tool; it is not an AetherEMS product installation requirement.
 
 ```bash
 corepack pnpm install --frozen-lockfile

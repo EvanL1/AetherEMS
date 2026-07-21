@@ -3,14 +3,20 @@
 Contributions must stay inside the AetherEMS distribution boundary. Generic
 kernel or protocol changes belong in the upstream AetherIot repository.
 
-Before opening a pull request, run:
+Before committing and pushing to `main`, run:
 
 ```bash
 ./scripts/check-repository-boundary.sh
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets
-cd processors/load-forecasting
+cd console
+corepack pnpm install --frozen-lockfile
+corepack pnpm run type-check:only
+corepack pnpm run lint:check
+corepack pnpm run test:coverage
+corepack pnpm run build
+cd ../processors/load-forecasting
 uv sync --locked --all-groups
 uv run ruff format --check .
 uv run ruff check .

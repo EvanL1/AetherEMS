@@ -28,12 +28,27 @@ console_root=console
 console_manifest="$console_root/package.json"
 [[ -s "$console_manifest" ]] || fail "AetherEMS console manifest is missing"
 [[ -s "$console_root/pnpm-lock.yaml" ]] || fail "AetherEMS console pnpm lockfile is missing"
+[[ -s "$console_root/pnpm-workspace.yaml" ]] || fail "AetherEMS console pnpm policy is missing"
+rg -Fq 'COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./' "$console_root/Dockerfile" \
+    || fail "AetherEMS console image does not apply the pinned pnpm policy"
 [[ ! -e "$console_root/package-lock.json" ]] \
     || fail "AetherEMS console must use pnpm as its single package authority"
 if [[ -s "$console_manifest" ]]; then
     rg -q '"name"[[:space:]]*:[[:space:]]*"aetherems-console"' "$console_manifest" \
         || fail "AetherEMS console package identity is invalid"
+    rg -q '"packageManager"[[:space:]]*:[[:space:]]*"pnpm@11\.13\.0\+sha512\.[0-9a-f]{128}"' \
+        "$console_manifest" || fail "AetherEMS console pnpm version is not reproducibly pinned"
+    rg -q '"audit:check"[[:space:]]*:[[:space:]]*"pnpm audit([[:space:]]|\")' "$console_manifest" \
+        || fail "AetherEMS console dependency audit must use pnpm"
 fi
+
+for product_readme in README.md README-CN.md; do
+    [[ -s "$product_readme" ]] || { fail "product README is missing: $product_readme"; continue; }
+    if rg -n '(^|[[:space:]`])(corepack[[:space:]]+)?(npm|npx|pnpm|bun|bunx)([[:space:]`]|$)' \
+        "$product_readme"; then
+        fail "$product_readme exposes an internal JavaScript package-manager command"
+    fi
+done
 
 if rg -n '(^|[,{[:space:]])path[[:space:]]*=' --glob 'Cargo.toml' .; then
     fail "local Cargo path dependencies are forbidden"

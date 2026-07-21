@@ -43,26 +43,11 @@ site commissioning (addresses, credentials, routing, enablement)
 Kernel services, protocol implementations, SHM code, and generic CLI code
 belong to AetherIot and are forbidden here.
 
-## Verify locally
+## Development
 
-```bash
-./scripts/check-repository-boundary.sh
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo test --workspace --all-targets
-cargo run -p aetherems-composition
-cd console
-corepack pnpm install --frozen-lockfile
-corepack pnpm run type-check:only
-corepack pnpm run lint:check
-corepack pnpm run test:coverage
-corepack pnpm run build
-cd ../processors/load-forecasting
-uv sync --locked --all-groups
-uv run ruff format --check .
-uv run ruff check .
-uv run pytest
-```
+Repository checks and internal Console and processor build instructions live in
+[CONTRIBUTING.md](CONTRIBUTING.md). They are contributor workflows, not an AetherEMS product
+installation path.
 
 The executable is a deterministic composition proof. It does not start
 Aether's six production services or commission a device.
