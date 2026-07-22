@@ -8,6 +8,11 @@ downstream release evidence. It does not contain or fork the AetherEdge kernel.
 The upstream Rust crates and CLI currently retain their `aether-*` and `aether`
 names for API compatibility; `AetherEdge` is the repository and product identity.
 
+> **New to AetherIoT?** Start with the
+> [AetherEdge README](https://github.com/EvanL1/AetherEdge#try-it-in-five-minutes) — the runnable
+> edge runtime — and the [documentation site](https://docs.aetheriot.workers.dev/en/). This
+> repository is the energy-domain distribution built on top of it.
+
 > **Release status:** this repository is independently versioned and has no
 > local path or direct implementation-crate dependency on AetherEdge. It consumes
 > the single `aether-edge-sdk` façade from the exact signed AetherEdge `v0.5.0`
