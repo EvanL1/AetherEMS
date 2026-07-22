@@ -11,10 +11,8 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/EvanL1/AetherEMS"
 
 [workspace.dependencies]
-# Bootstrap-only exact Git pins. Replace both entries with exact crates.io
-# versions after Aether publishes the 0.5 release train.
-aether-sdk = { package = "aether-edge-sdk", git = "https://github.com/EvanL1/AetherEdge.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
-aether-store-local = { git = "https://github.com/EvanL1/AetherEdge.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
+# One supported AetherEdge facade, pinned to the exact v0.5.0 release commit.
+aether-sdk = { package = "aether-edge-sdk", git = "https://github.com/EvanL1/AetherEdge.git", rev = "fbb9f3ecd52085072979461dd4a069c73d26397b", features = ["local-runtime"] }
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

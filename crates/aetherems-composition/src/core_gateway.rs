@@ -4,11 +4,11 @@ use std::sync::Arc;
 
 use aether_sdk::application::{EdgeApplication, SafetyPolicy};
 use aether_sdk::domain::{ControlCommand, PointSample};
+use aether_sdk::local::{MemoryAuditSink, MemoryLiveState};
 use aether_sdk::ports::{
     CommandDispatcher, CommandReceipt, LiveStateWriter, PortError, PortErrorKind, PortResult,
 };
 use aether_sdk::{AetherBuilder, BuildError};
-use aether_store_local::{MemoryAuditSink, MemoryLiveState};
 use async_trait::async_trait;
 
 struct NoDeviceDispatcher;

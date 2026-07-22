@@ -37,6 +37,11 @@ jobs:
       - name: Check repository boundary
         run: ./scripts/check-repository-boundary.sh
 
+      - name: Verify upstream AetherEdge release evidence
+        run: ./scripts/check-release-readiness.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Lint downstream composition
         run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 
