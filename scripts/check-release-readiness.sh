@@ -79,6 +79,9 @@ rg -q "rev = \"$commit\"" "$ROOT_DIR/Cargo.toml" \
     || fail "the SDK facade is not pinned to the recorded release commit"
 rg -q 'features = \["local-runtime"\]' "$ROOT_DIR/Cargo.toml" \
     || fail "the SDK facade does not expose the local runtime composition"
+rg -q "const AETHER_VERSION: &str = \"$version\";" \
+    "$ROOT_DIR/crates/aetherems-composition/src/lib.rs" \
+    || fail "AETHER_VERSION in the composition does not match the recorded aetheriot_version"
 if rg -n 'aether-store-local' --glob 'Cargo.toml' "$ROOT_DIR"; then
     fail "AetherEMS directly depends on an AetherEdge implementation package"
 fi

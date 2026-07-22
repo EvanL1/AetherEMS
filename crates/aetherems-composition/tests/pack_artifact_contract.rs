@@ -40,7 +40,7 @@ fn repository_pack_root() -> PathBuf {
 }
 
 fn runtime() -> PackRuntime {
-    PackRuntime::new(env!("CARGO_PKG_VERSION"))
+    PackRuntime::new(aetherems_composition::AETHER_VERSION)
         .with_capabilities(
             aether_sdk::application::capability_catalog()
                 .iter()

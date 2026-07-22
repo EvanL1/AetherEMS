@@ -12,6 +12,10 @@ use core_gateway::MinimalGateway;
 use serde::Deserialize;
 use thiserror::Error;
 
+/// AetherEdge kernel version consumed by this composition. The authority is
+/// `distribution/aetheriot-dependency.toml`; the release-readiness gate keeps
+/// this constant in sync with it.
+pub const AETHER_VERSION: &str = "0.5.0";
 const ENERGY_PACK_MANIFEST: &str = include_str!("../../../packs/energy/pack.yaml");
 const ENERGY_IO_EXAMPLES: &str = include_str!("../../../packs/energy/examples/config/io/io.yaml");
 const ENERGY_AUTOMATION_EXAMPLE: &str =
@@ -267,7 +271,7 @@ impl EnergyGateway {
 }
 
 fn energy_pack_runtime() -> PackRuntime {
-    PackRuntime::new(env!("CARGO_PKG_VERSION"))
+    PackRuntime::new(AETHER_VERSION)
         .with_capabilities(
             aether_sdk::application::capability_catalog()
                 .iter()

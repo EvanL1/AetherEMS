@@ -1,12 +1,12 @@
 schema_version: 1
 id: energy
 name: Aether Energy
-version: 0.5.0
+version: 0.1.0
 status: migrating
 description: Energy storage, generation, load, and grid-management knowledge
 distribution:
   id: aether-ems
-  version: 0.5.0
+  version: 0.1.0
   composition: aetherems-composition
 compatibility:
   aether: ">=0.5.0,<0.6.0"
