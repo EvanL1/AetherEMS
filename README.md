@@ -8,11 +8,11 @@ downstream release evidence. It does not contain or fork the AetherEdge kernel.
 The upstream Rust crates and CLI currently retain their `aether-*` and `aether`
 names for API compatibility; `AetherEdge` is the repository and product identity.
 
-> **Migration status:** this repository is independently versioned and has no
-> local path dependency on AetherEdge. Until AetherEdge publishes its first signed
-> public crate/runtime release, development is pinned to one immutable AetherEdge
-> Git commit. AetherEMS releases remain blocked by ADR-0001 during this bootstrap
-> window.
+> **Release status:** this repository is independently versioned and has no
+> local path or direct implementation-crate dependency on AetherEdge. It consumes
+> the single `aether-edge-sdk` façade from the exact signed AetherEdge `v0.5.0`
+> source release. Runtime, CLI, source, checksums, and provenance are recorded in
+> the downstream dependency authority described by ADR-0001.
 
 ## Repository boundary
 

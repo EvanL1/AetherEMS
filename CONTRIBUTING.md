@@ -7,6 +7,7 @@ Before committing and pushing to `main`, run:
 
 ```bash
 ./scripts/check-repository-boundary.sh
+./scripts/check-release-readiness.sh
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets

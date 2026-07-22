@@ -15,6 +15,9 @@ file, so every agent reads and edits the same instructions.
 - Cargo dependencies on AetherEdge must use the single authority in
   `distribution/aetheriot-dependency.toml`; committed local `path` overrides are
   forbidden.
+- Cargo must consume only the released `aether-edge-sdk` façade at the exact
+  release commit. Direct dependencies on AetherEdge implementation crates are
+  forbidden.
 
 ## Safety
 
@@ -32,6 +35,7 @@ Run:
 
 ```bash
 ./scripts/check-repository-boundary.sh
+./scripts/check-release-readiness.sh
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-targets
@@ -48,6 +52,7 @@ uv run ruff check .
 uv run pytest
 ```
 
-An AetherEMS release additionally requires
-`./scripts/check-release-readiness.sh`, which intentionally fails while the
-bootstrap Git pin is active.
+`./scripts/check-release-readiness.sh` validates the pinned upstream source,
+runtime and CLI checksums, and GitHub artifact attestation. It requires network
+access and an authenticated GitHub CLI; use
+`AETHEREMS_OFFLINE_RELEASE_CHECK=1` only for narrow local script tests.

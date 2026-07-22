@@ -1,10 +1,32 @@
-schema = "aetherems.aetheriot-dependency.v1"
-mode = "bootstrap-git"
+schema = "aetherems.aetheriot-dependency.v2"
+mode = "released-git"
 aetheriot_version = "0.5.0"
 repository = "https://github.com/EvanL1/AetherEdge.git"
-commit = "25a75263da04ea352124814cbf95826f12e63032"
-release_evidence_complete = false
+release_tag = "v0.5.0"
+release_commit = "fbb9f3ecd52085072979461dd4a069c73d26397b"
+release_url = "https://github.com/EvanL1/AetherEdge/releases/tag/v0.5.0"
+release_evidence_complete = true
+source_asset = "aetheriot-source-v0.5.0.tar.gz"
+source_sha256 = "cc87c9cb1023986c43263aeed688f22fc7d7f1f9cad9b164e72d58f4dfd4e7e6"
+runtime_arm64_asset = "AetherEdge-arm64-0.5.0.run"
+runtime_arm64_sha256 = "76cfb59ea1d85c736544144e8194bf4004cfbf11b8e364934ca54688b4d85f8d"
+runtime_amd64_asset = "AetherEdge-amd64-0.5.0.run"
+runtime_amd64_sha256 = "1d0043b44ce26be62a6e51e0e03d9f67e1933ef5af9e937e9d9d8b2ec3dd0d46"
+runtime_manifest_arm64_asset = "aetheriot-runtime-manifest-arm64-0.5.0.json"
+runtime_manifest_arm64_sha256 = "833c7c909e2c324661868cc7b2f535e4aefac88ac4157d7dd194c7a6b18ca53d"
+runtime_manifest_amd64_asset = "aetheriot-runtime-manifest-amd64-0.5.0.json"
+runtime_manifest_amd64_sha256 = "8393a9930dd906ff0c3b724521ed61a24ee008f5f3fd642dbc4860f7eb621bf0"
+cli_linux_x86_64_asset = "aether-linux-x86_64.tar.gz"
+cli_linux_x86_64_sha256 = "0e3ee6143476088b98ece72c17b560f5fd2de62b74e1af65ddd5661ba6887c77"
+cli_linux_aarch64_asset = "aether-linux-aarch64.tar.gz"
+cli_linux_aarch64_sha256 = "be544f2739374e0466d397e7205b3cbf0028f0fd6d482d3f793372e253c0e7d0"
+cli_darwin_aarch64_asset = "aether-darwin-aarch64.tar.gz"
+cli_darwin_aarch64_sha256 = "db08e3b4cbed9f2a066abccb87a791c665079041863e258ed69195e6b1da9a96"
+cli_windows_x86_64_asset = "aether-windows-x86_64.zip"
+cli_windows_x86_64_sha256 = "ef092f2afd99428c003f3f16ce42663e87c0f95af4e07f6c470509b6d9d00cae"
+provenance_asset = "aetheriot-v0.5.0-provenance.sigstore.json"
+provenance_sha256 = "2cdb0a2836c48efc7077c8572cd558cd43e5a429fbd42f981cc68ae98c764130"
 
-# A formal AetherEMS release must replace bootstrap-git with released, set the
-# exact signed CLI/runtime/runtime-manifest assets and SHA-256 values, and make
-# the downstream release-readiness gate pass.
+# The sigstore certificate keeps the repository identity from signing time.
+# v0.5.0 was signed before the GitHub rename to EvanL1/AetherEdge.
+provenance_signer_repository = "EvanL1/AetherIot"
