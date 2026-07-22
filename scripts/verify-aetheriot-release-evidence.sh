@@ -23,6 +23,10 @@ done
 version=$(quoted aetheriot_version)
 tag=$(quoted release_tag)
 commit=$(quoted release_commit)
+# Sigstore certificates keep the repository identity from signing time, so a
+# renamed repository must verify against the recorded signer, not $repo.
+signer_repository=$(quoted provenance_signer_repository)
+[[ -n "$signer_repository" ]] || fail "provenance_signer_repository is not recorded"
 release_url="https://github.com/$repo/releases/download/$tag"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -30,17 +34,8 @@ trap 'rm -rf "$tmp"' EXIT
 remote_commit=$(gh api "repos/$repo/commits/$tag" --jq .sha)
 [[ "$remote_commit" == "$commit" ]] || fail "tag $tag resolves to $remote_commit, expected $commit"
 
-for crate in aether-edge-sdk aether-store-local; do
-    key=${crate//-/_}
-    expected=$(quoted "crate_${key}_checksum")
-    actual=$(curl --fail --silent --show-error \
-        --user-agent "AetherEMS release verifier (https://github.com/EvanL1/AetherEMS)" \
-        "https://crates.io/api/v1/crates/$crate/$version" \
-        | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"]["checksum"])')
-    [[ "$actual" == "$expected" ]] || fail "$crate@$version checksum mismatch"
-done
-
 asset_pairs=(
+    source
     runtime_arm64 runtime_amd64
     runtime_manifest_arm64 runtime_manifest_amd64
     cli_linux_x86_64 cli_linux_aarch64
@@ -58,6 +53,11 @@ for prefix in "${asset_pairs[@]}"; do
     [[ "$recorded_name" == "$asset" ]] || fail "$asset checksum file names '$recorded_name'"
 done
 
+source_asset=$(quoted source_asset)
+source_sha=$(quoted source_sha256)
+curl --fail --silent --show-error --location "$release_url/$source_asset" -o "$tmp/$source_asset"
+printf '%s  %s\n' "$source_sha" "$tmp/$source_asset" | sha256sum -c - >/dev/null
+
 manifest=$(quoted runtime_manifest_amd64_asset)
 manifest_sha=$(quoted runtime_manifest_amd64_sha256)
 curl --fail --silent --show-error --location "$release_url/$manifest" -o "$tmp/$manifest"
@@ -69,10 +69,10 @@ curl --fail --silent --show-error --location "$release_url/$bundle" -o "$tmp/$bu
 printf '%s  %s\n' "$bundle_sha" "$tmp/$bundle" | sha256sum -c - >/dev/null
 
 verification="$tmp/verification.json"
-gh attestation verify "$tmp/$manifest" \
-    --repo "$repo" \
+gh attestation verify "$tmp/$source_asset" \
+    --repo "$signer_repository" \
     --bundle "$tmp/$bundle" \
-    --signer-workflow "$repo/.github/workflows/release.yml" \
+    --signer-workflow "$signer_repository/.github/workflows/release.yml" \
     --source-ref "refs/tags/$tag" \
     --source-digest "$commit" \
     --format json > "$verification"
@@ -93,6 +93,7 @@ for line in open(authority, encoding="utf-8"):
 required = {
     values[f"{prefix}_asset"]: values[f"{prefix}_sha256"]
     for prefix in (
+        "source",
         "runtime_arm64",
         "runtime_amd64",
         "runtime_manifest_arm64",
@@ -115,4 +116,4 @@ if missing:
     raise SystemExit(f"signed provenance is missing recorded release subjects: {sorted(missing)}")
 PY
 
-echo "Verified AetherEdge $tag crates, release checksums, and signed provenance"
+echo "Verified AetherEdge $tag source, release checksums, and signed provenance"

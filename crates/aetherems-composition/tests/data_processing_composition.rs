@@ -9,10 +9,10 @@ use aether_sdk::domain::{
     ProcessTaskRequest, ProcessingOptions, ProcessingOutput, ProcessingStatus, SampleQuality,
     Segment, SegmentKind, Series, SourceKind, SourceProvenance, TimestampMs,
 };
-use aether_sdk::ports::SourcedSegment;
-use aether_store_local::{
+use aether_sdk::local::{
     ManualClock, MemoryAuditSink, MemoryCovariateSource, MemoryHistoryQuery, MemoryLiveState,
 };
+use aether_sdk::ports::SourcedSegment;
 use aetherems_composition::{EnergyGateway, PersistenceForecastProcessor};
 
 fn series(definition: FeatureDefinition, values: Vec<f64>) -> Series {

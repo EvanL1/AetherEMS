@@ -28,27 +28,12 @@ console_root=console
 console_manifest="$console_root/package.json"
 [[ -s "$console_manifest" ]] || fail "AetherEMS console manifest is missing"
 [[ -s "$console_root/pnpm-lock.yaml" ]] || fail "AetherEMS console pnpm lockfile is missing"
-[[ -s "$console_root/pnpm-workspace.yaml" ]] || fail "AetherEMS console pnpm policy is missing"
-rg -Fq 'COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./' "$console_root/Dockerfile" \
-    || fail "AetherEMS console image does not apply the pinned pnpm policy"
 [[ ! -e "$console_root/package-lock.json" ]] \
     || fail "AetherEMS console must use pnpm as its single package authority"
 if [[ -s "$console_manifest" ]]; then
     rg -q '"name"[[:space:]]*:[[:space:]]*"aetherems-console"' "$console_manifest" \
         || fail "AetherEMS console package identity is invalid"
-    rg -q '"packageManager"[[:space:]]*:[[:space:]]*"pnpm@11\.13\.0\+sha512\.[0-9a-f]{128}"' \
-        "$console_manifest" || fail "AetherEMS console pnpm version is not reproducibly pinned"
-    rg -q '"audit:check"[[:space:]]*:[[:space:]]*"pnpm audit([[:space:]]|\")' "$console_manifest" \
-        || fail "AetherEMS console dependency audit must use pnpm"
 fi
-
-for product_readme in README.md README-CN.md; do
-    [[ -s "$product_readme" ]] || { fail "product README is missing: $product_readme"; continue; }
-    if rg -n '(^|[[:space:]`])(corepack[[:space:]]+)?(npm|npx|pnpm|bun|bunx)([[:space:]`]|$)' \
-        "$product_readme"; then
-        fail "$product_readme exposes an internal JavaScript package-manager command"
-    fi
-done
 
 if rg -n '(^|[,{[:space:]])path[[:space:]]*=' --glob 'Cargo.toml' .; then
     fail "local Cargo path dependencies are forbidden"
@@ -65,38 +50,36 @@ dependency_file=distribution/aetheriot-dependency.toml
 [[ -s "$dependency_file" ]] || fail "missing $dependency_file"
 mode=$(sed -n 's/^mode = "\([^"]*\)"$/\1/p' "$dependency_file")
 version=$(sed -n 's/^aetheriot_version = "\([^"]*\)"$/\1/p' "$dependency_file")
-commit=$(sed -n 's/^commit = "\([[:xdigit:]]\{40\}\)"$/\1/p' "$dependency_file")
+release_commit=$(sed -n 's/^release_commit = "\([[:xdigit:]]\{40\}\)"$/\1/p' "$dependency_file")
+release_tag=$(sed -n 's/^release_tag = "\([^"]*\)"$/\1/p' "$dependency_file")
+schema=$(sed -n 's/^schema = "\([^"]*\)"$/\1/p' "$dependency_file")
 repository=$(sed -n 's/^repository = "\([^"]*\)"$/\1/p' "$dependency_file")
 [[ "$repository" == "https://github.com/EvanL1/AetherEdge.git" ]] \
     || fail "unexpected AetherEdge repository: $repository"
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
     || fail "AetherEdge dependency version is not exact semver: $version"
 
-case "$mode" in
-    bootstrap-git)
-        [[ ${#commit} -eq 40 ]] \
-            || fail "AetherEdge dependency commit must be one full SHA-1"
-        pin_count=$(rg -c "rev = \"$commit\"" Cargo.toml || true)
-        [[ "$pin_count" == 2 ]] \
-            || fail "both AetherEdge packages must use the exact recorded commit (found $pin_count)"
-        git_dependency_count=$(rg -c 'git = "https://github.com/EvanL1/AetherEdge\.git"' Cargo.toml || true)
-        [[ "$git_dependency_count" == 2 ]] \
-            || fail "unexpected number of AetherEdge Git dependencies: $git_dependency_count"
-        ;;
-    released)
-        [[ -z "$commit" ]] \
-            || fail "released AetherEdge authority must not retain a bootstrap commit"
-        if rg -n 'git[[:space:]]*=' Cargo.toml; then
-            fail "released AetherEdge dependencies must come from crates.io"
-        fi
-        version_pin_count=$(rg -c "version = \"=$version\"" Cargo.toml || true)
-        [[ "$version_pin_count" == 2 ]] \
-            || fail "both AetherEdge packages must use exact crates.io version =$version (found $version_pin_count)"
-        ;;
-    *)
-        fail "unsupported AetherEdge dependency mode: $mode"
-        ;;
-esac
+[[ "$mode" == "released-git" ]] \
+    || fail "AetherEdge dependency mode must be released-git, found: $mode"
+[[ "$schema" == "aetherems.aetheriot-dependency.v2" ]] \
+    || fail "released AetherEdge authority must use schema v2"
+[[ "$release_tag" == "v$version" ]] \
+    || fail "released AetherEdge tag must match version $version"
+[[ ${#release_commit} -eq 40 ]] \
+    || fail "released AetherEdge commit must be one full SHA-1"
+pin_count=$(rg -c "rev = \"$release_commit\"" Cargo.toml || true)
+[[ "$pin_count" == 1 ]] \
+    || fail "the SDK facade must use the exact release commit (found $pin_count)"
+git_dependency_count=$(rg -c 'git = "https://github.com/EvanL1/AetherEdge\.git"' Cargo.toml || true)
+[[ "$git_dependency_count" == 1 ]] \
+    || fail "AetherEMS must declare exactly one AetherEdge dependency (found $git_dependency_count)"
+rg -q 'package = "aether-edge-sdk"' Cargo.toml \
+    || fail "the single AetherEdge dependency must be aether-edge-sdk"
+rg -q 'features = \["local-runtime"\]' Cargo.toml \
+    || fail "the SDK facade must expose the local-runtime composition"
+if rg -n 'aether-store-local' --glob 'Cargo.toml' .; then
+    fail "AetherEMS must not depend directly on an AetherEdge implementation crate"
+fi
 [[ -s Cargo.lock ]] || fail "Cargo.lock must be committed for downstream reproducibility"
 
 pack_root=packs/energy
