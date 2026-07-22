@@ -5,7 +5,7 @@ version = 4
 [[package]]
 name = "aether-application"
 version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherIot.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
 dependencies = [
  "aether-data-processing",
  "aether-domain",
@@ -19,7 +19,7 @@ dependencies = [
 [[package]]
 name = "aether-data-processing"
 version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherIot.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
 dependencies = [
  "aether-domain",
  "chrono",
@@ -33,12 +33,12 @@ dependencies = [
 [[package]]
 name = "aether-domain"
 version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherIot.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
 
 [[package]]
 name = "aether-edge-sdk"
 version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherIot.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
 dependencies = [
  "aether-application",
  "aether-domain",
@@ -50,7 +50,7 @@ dependencies = [
 [[package]]
 name = "aether-pack"
 version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherIot.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
 dependencies = [
  "semver",
  "serde",
@@ -62,7 +62,7 @@ dependencies = [
 [[package]]
 name = "aether-ports"
 version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherIot.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
 dependencies = [
  "aether-domain",
  "async-trait",
@@ -71,7 +71,7 @@ dependencies = [
 [[package]]
 name = "aether-store-local"
 version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherIot.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=25a75263da04ea352124814cbf95826f12e63032#25a75263da04ea352124814cbf95826f12e63032"
 dependencies = [
  "aether-domain",
  "aether-ports",

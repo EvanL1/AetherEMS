@@ -1,14 +1,14 @@
 # Extraction provenance
 
-This repository was initialized from the AetherIot integration workspace on
+This repository was initialized from the AetherEdge integration workspace on
 2026-07-13.
 
-- Source repository: `https://github.com/EvanL1/AetherIot`
+- Source repository: `https://github.com/EvanL1/AetherEdge`
 - Source commit: `25a75263da04ea352124814cbf95826f12e63032`
 - Extracted owners: `apps` (now `console`), `packs/energy`, `examples/energy-gateway`,
   `integrations/load-forecasting`, and
   `distributions/aetherems/runtime-io-features.txt`
-- Excluded owners: AetherIot `.git`, Kernel crates, libraries, services, tools,
+- Excluded owners: AetherEdge `.git`, Kernel crates, libraries, services, tools,
   generic extensions, build output, caches, and deployment data
 
 The composition was rewritten to remove workspace paths and private example or

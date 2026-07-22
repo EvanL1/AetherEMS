@@ -43,7 +43,7 @@ own configuration and audit database remains separately writable. Until that
 split exists, the direct-SQLite route is a blocked commissioning example even
 though the adapter itself opens SQLite read-only.
 
-Run that command from the Aether repository root. The production override is
+Run that command from the AetherEMS repository root. The production override is
 intentional: the base file exposes only the mutable `data-processing-dev`
 profile and does not evaluate production secrets or enable the Aether route.
 

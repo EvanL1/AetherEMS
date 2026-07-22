@@ -4,10 +4,10 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 dependency_file="$ROOT_DIR/distribution/aetheriot-dependency.toml"
-repo=EvanL1/AetherIot
+repo=EvanL1/AetherEdge
 
 fail() {
-    echo "AetherIot release evidence verification failed: $*" >&2
+    echo "AetherEdge release evidence verification failed: $*" >&2
     exit 1
 }
 
@@ -115,4 +115,4 @@ if missing:
     raise SystemExit(f"signed provenance is missing recorded release subjects: {sorted(missing)}")
 PY
 
-echo "Verified AetherIot $tag crates, release checksums, and signed provenance"
+echo "Verified AetherEdge $tag crates, release checksums, and signed provenance"

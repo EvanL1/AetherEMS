@@ -28,12 +28,27 @@ console_root=console
 console_manifest="$console_root/package.json"
 [[ -s "$console_manifest" ]] || fail "AetherEMS console manifest is missing"
 [[ -s "$console_root/pnpm-lock.yaml" ]] || fail "AetherEMS console pnpm lockfile is missing"
+[[ -s "$console_root/pnpm-workspace.yaml" ]] || fail "AetherEMS console pnpm policy is missing"
+rg -Fq 'COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./' "$console_root/Dockerfile" \
+    || fail "AetherEMS console image does not apply the pinned pnpm policy"
 [[ ! -e "$console_root/package-lock.json" ]] \
     || fail "AetherEMS console must use pnpm as its single package authority"
 if [[ -s "$console_manifest" ]]; then
     rg -q '"name"[[:space:]]*:[[:space:]]*"aetherems-console"' "$console_manifest" \
         || fail "AetherEMS console package identity is invalid"
+    rg -q '"packageManager"[[:space:]]*:[[:space:]]*"pnpm@11\.13\.0\+sha512\.[0-9a-f]{128}"' \
+        "$console_manifest" || fail "AetherEMS console pnpm version is not reproducibly pinned"
+    rg -q '"audit:check"[[:space:]]*:[[:space:]]*"pnpm audit([[:space:]]|\")' "$console_manifest" \
+        || fail "AetherEMS console dependency audit must use pnpm"
 fi
+
+for product_readme in README.md README-CN.md; do
+    [[ -s "$product_readme" ]] || { fail "product README is missing: $product_readme"; continue; }
+    if rg -n '(^|[[:space:]`])(corepack[[:space:]]+)?(npm|npx|pnpm|bun|bunx)([[:space:]`]|$)' \
+        "$product_readme"; then
+        fail "$product_readme exposes an internal JavaScript package-manager command"
+    fi
+done
 
 if rg -n '(^|[,{[:space:]])path[[:space:]]*=' --glob 'Cargo.toml' .; then
     fail "local Cargo path dependencies are forbidden"
@@ -52,34 +67,34 @@ mode=$(sed -n 's/^mode = "\([^"]*\)"$/\1/p' "$dependency_file")
 version=$(sed -n 's/^aetheriot_version = "\([^"]*\)"$/\1/p' "$dependency_file")
 commit=$(sed -n 's/^commit = "\([[:xdigit:]]\{40\}\)"$/\1/p' "$dependency_file")
 repository=$(sed -n 's/^repository = "\([^"]*\)"$/\1/p' "$dependency_file")
-[[ "$repository" == "https://github.com/EvanL1/AetherIot.git" ]] \
-    || fail "unexpected AetherIot repository: $repository"
+[[ "$repository" == "https://github.com/EvanL1/AetherEdge.git" ]] \
+    || fail "unexpected AetherEdge repository: $repository"
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
-    || fail "AetherIot dependency version is not exact semver: $version"
+    || fail "AetherEdge dependency version is not exact semver: $version"
 
 case "$mode" in
     bootstrap-git)
         [[ ${#commit} -eq 40 ]] \
-            || fail "AetherIot dependency commit must be one full SHA-1"
+            || fail "AetherEdge dependency commit must be one full SHA-1"
         pin_count=$(rg -c "rev = \"$commit\"" Cargo.toml || true)
         [[ "$pin_count" == 2 ]] \
-            || fail "both AetherIot packages must use the exact recorded commit (found $pin_count)"
-        git_dependency_count=$(rg -c 'git = "https://github.com/EvanL1/AetherIot\.git"' Cargo.toml || true)
+            || fail "both AetherEdge packages must use the exact recorded commit (found $pin_count)"
+        git_dependency_count=$(rg -c 'git = "https://github.com/EvanL1/AetherEdge\.git"' Cargo.toml || true)
         [[ "$git_dependency_count" == 2 ]] \
-            || fail "unexpected number of AetherIot Git dependencies: $git_dependency_count"
+            || fail "unexpected number of AetherEdge Git dependencies: $git_dependency_count"
         ;;
     released)
         [[ -z "$commit" ]] \
-            || fail "released AetherIot authority must not retain a bootstrap commit"
+            || fail "released AetherEdge authority must not retain a bootstrap commit"
         if rg -n 'git[[:space:]]*=' Cargo.toml; then
-            fail "released AetherIot dependencies must come from crates.io"
+            fail "released AetherEdge dependencies must come from crates.io"
         fi
         version_pin_count=$(rg -c "version = \"=$version\"" Cargo.toml || true)
         [[ "$version_pin_count" == 2 ]] \
-            || fail "both AetherIot packages must use exact crates.io version =$version (found $version_pin_count)"
+            || fail "both AetherEdge packages must use exact crates.io version =$version (found $version_pin_count)"
         ;;
     *)
-        fail "unsupported AetherIot dependency mode: $mode"
+        fail "unsupported AetherEdge dependency mode: $mode"
         ;;
 esac
 [[ -s Cargo.lock ]] || fail "Cargo.lock must be committed for downstream reproducibility"

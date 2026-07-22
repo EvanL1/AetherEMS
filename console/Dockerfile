@@ -4,11 +4,11 @@ FROM node:22-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 启用 corepack 并准备 pnpm（自动使用 package.json 中指定的版本）
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# 启用 Corepack；pnpm 版本由 package.json 的完整哈希固定
+RUN corepack enable
 
-# 复制 package.json 和 pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml ./
+# 复制依赖清单、锁文件和受审查的安装脚本策略
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # 安装依赖
 RUN pnpm install --frozen-lockfile

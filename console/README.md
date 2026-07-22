@@ -1,12 +1,12 @@
 # AetherEMS Console
 
 AetherEMS Console is the optional energy-operations reference application for
-[AetherIot](https://github.com/EvanL1/AetherIot). It demonstrates how an
-energy-domain UI can consume AetherIot contracts without turning the browser
+[AetherEdge](https://github.com/EvanL1/AetherEdge). It demonstrates how an
+energy-domain UI can consume AetherEdge contracts without turning the browser
 into a live-state, configuration, authorization, or safety authority.
 
 The Console is owned and released by AetherEMS. It is not bundled with the
-headless AetherIot kernel and is not required to operate an AetherIot site.
+headless AetherEdge kernel and is not required to operate an AetherEdge site.
 
 ## Application boundary
 
@@ -31,7 +31,8 @@ or internal process port returns.
 
 ## Local development
 
-Requirements: Node.js 20+ and Corepack.
+Requirements: Node.js 22.13+ in the Node 22 LTS line and Corepack. pnpm is an internal Console build
+tool; it is not an AetherEMS product installation requirement.
 
 ```bash
 corepack pnpm install --frozen-lockfile
@@ -59,12 +60,12 @@ consume those wrappers rather than introduce an alternate transport client.
 ## Role in an AI-native product
 
 This repository keeps the Console as a tested example and operator baseline,
-not as the universal AetherIot UI. New site-specific applications should be
+not as the universal AetherEdge UI. New site-specific applications should be
 generated from the active runtime manifest, Energy Pack, OpenAPI contracts,
 and agent-readable documentation. If a required public capability is missing,
-add it to the AetherIot application boundary; do not expose a process port as a
+add it to the AetherEdge application boundary; do not expose a process port as a
 shortcut.
 
-See the AetherIot guide
+See the AetherEdge guide
 [Build Applications with AI](https://docs.aetheriot.workers.dev/guides/build-applications-with-ai/)
 for the contract-first workflow.

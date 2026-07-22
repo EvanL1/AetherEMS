@@ -13,8 +13,8 @@ repository = "https://github.com/EvanL1/AetherEMS"
 [workspace.dependencies]
 # Bootstrap-only exact Git pins. Replace both entries with exact crates.io
 # versions after Aether publishes the 0.5 release train.
-aether-sdk = { package = "aether-edge-sdk", git = "https://github.com/EvanL1/AetherIot.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
-aether-store-local = { git = "https://github.com/EvanL1/AetherIot.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
+aether-sdk = { package = "aether-edge-sdk", git = "https://github.com/EvanL1/AetherEdge.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
+aether-store-local = { git = "https://github.com/EvanL1/AetherEdge.git", rev = "25a75263da04ea352124814cbf95826f12e63032" }
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
