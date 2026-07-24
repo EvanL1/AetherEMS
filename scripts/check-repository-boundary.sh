@@ -50,8 +50,6 @@ dependency_file=distribution/aetheriot-dependency.toml
 [[ -s "$dependency_file" ]] || fail "missing $dependency_file"
 mode=$(sed -n 's/^mode = "\([^"]*\)"$/\1/p' "$dependency_file")
 version=$(sed -n 's/^aetheriot_version = "\([^"]*\)"$/\1/p' "$dependency_file")
-release_commit=$(sed -n 's/^release_commit = "\([[:xdigit:]]\{40\}\)"$/\1/p' "$dependency_file")
-release_tag=$(sed -n 's/^release_tag = "\([^"]*\)"$/\1/p' "$dependency_file")
 schema=$(sed -n 's/^schema = "\([^"]*\)"$/\1/p' "$dependency_file")
 repository=$(sed -n 's/^repository = "\([^"]*\)"$/\1/p' "$dependency_file")
 [[ "$repository" == "https://github.com/EvanL1/AetherEdge.git" ]] \
@@ -59,17 +57,37 @@ repository=$(sed -n 's/^repository = "\([^"]*\)"$/\1/p' "$dependency_file")
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
     || fail "AetherEdge dependency version is not exact semver: $version"
 
-[[ "$mode" == "released-git" ]] \
-    || fail "AetherEdge dependency mode must be released-git, found: $mode"
-[[ "$schema" == "aetherems.aetheriot-dependency.v2" ]] \
-    || fail "released AetherEdge authority must use schema v2"
-[[ "$release_tag" == "v$version" ]] \
-    || fail "released AetherEdge tag must match version $version"
-[[ ${#release_commit} -eq 40 ]] \
-    || fail "released AetherEdge commit must be one full SHA-1"
-pin_count=$(rg -c "rev = \"$release_commit\"" Cargo.toml || true)
-[[ "$pin_count" == 1 ]] \
-    || fail "the SDK facade must use the exact release commit (found $pin_count)"
+pinned_commit=""
+case "$mode" in
+    bootstrap-git)
+        [[ "$schema" == "aetherems.aetheriot-dependency.v1" ]] \
+            || fail "bootstrap AetherEdge authority must use schema v1"
+        commit=$(sed -n 's/^commit = "\([[:xdigit:]]\{40\}\)"$/\1/p' "$dependency_file")
+        [[ ${#commit} -eq 40 ]] \
+            || fail "bootstrap AetherEdge commit must be one full SHA-1"
+        pinned_commit="$commit"
+        ;;
+    released-git)
+        [[ "$schema" == "aetherems.aetheriot-dependency.v2" ]] \
+            || fail "released AetherEdge authority must use schema v2"
+        release_tag=$(sed -n 's/^release_tag = "\([^"]*\)"$/\1/p' "$dependency_file")
+        release_commit=$(sed -n 's/^release_commit = "\([[:xdigit:]]\{40\}\)"$/\1/p' "$dependency_file")
+        [[ "$release_tag" == "v$version" ]] \
+            || fail "released AetherEdge tag must match version $version"
+        [[ ${#release_commit} -eq 40 ]] \
+            || fail "released AetherEdge commit must be one full SHA-1"
+        pinned_commit="$release_commit"
+        ;;
+    *)
+        fail "unsupported AetherEdge dependency mode: $mode"
+        ;;
+esac
+
+if [[ -n "$pinned_commit" ]]; then
+    pin_count=$(rg -c "rev = \"$pinned_commit\"" Cargo.toml || true)
+    [[ "$pin_count" == 1 ]] \
+        || fail "the SDK facade must use the exact recorded commit (found $pin_count)"
+fi
 git_dependency_count=$(rg -c 'git = "https://github.com/EvanL1/AetherEdge\.git"' Cargo.toml || true)
 [[ "$git_dependency_count" == 1 ]] \
     || fail "AetherEMS must declare exactly one AetherEdge dependency (found $git_dependency_count)"

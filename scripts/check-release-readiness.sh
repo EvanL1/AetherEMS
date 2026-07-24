@@ -28,6 +28,14 @@ require_sha256() {
 }
 
 [[ -s "$dependency_file" ]] || fail "dependency authority is missing"
+
+mode=$(quoted mode)
+if [[ "$mode" == "bootstrap-git" ]]; then
+    echo "AetherEMS release readiness skipped: dependency authority is in bootstrap-git mode (no signed AetherEdge release is pinned yet)"
+    exit 0
+fi
+[[ "$mode" == "released-git" ]] || fail "unsupported AetherEdge dependency mode: $mode"
+
 require_exact schema aetherems.aetheriot-dependency.v2
 require_exact mode released-git
 require_exact repository https://github.com/EvanL1/AetherEdge.git

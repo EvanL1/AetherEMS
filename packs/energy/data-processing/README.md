@@ -232,4 +232,4 @@ ruby -e 'require "json"; Dir["packs/energy/data-processing/**/*.json"].sort.each
 ```
 
 The normative wire rules are documented in
-[Aether Data Processing contracts](https://github.com/EvanL1/AetherEdge/blob/v0.5.0/docs/reference/data-processing-contracts.md).
+[Aether Data Processing contracts](https://github.com/EvanL1/AetherEdge/blob/7c427f41dbe6a7780cb96a162f60fdc2a065cff5/docs/reference/data-processing-contracts.md).

@@ -15,9 +15,9 @@ file, so every agent reads and edits the same instructions.
 - Cargo dependencies on AetherEdge must use the single authority in
   `distribution/aetheriot-dependency.toml`; committed local `path` overrides are
   forbidden.
-- Cargo must consume only the released `aether-edge-sdk` façade at the exact
-  release commit. Direct dependencies on AetherEdge implementation crates are
-  forbidden.
+- Cargo must consume only the `aether-edge-sdk` façade at the exact commit
+  recorded by that authority. Direct dependencies on AetherEdge implementation
+  crates are forbidden.
 
 ## Safety
 
@@ -52,7 +52,11 @@ uv run ruff check .
 uv run pytest
 ```
 
-`./scripts/check-release-readiness.sh` validates the pinned upstream source,
-runtime and CLI checksums, and GitHub artifact attestation. It requires network
-access and an authenticated GitHub CLI; use
-`AETHEREMS_OFFLINE_RELEASE_CHECK=1` only for narrow local script tests.
+An AetherEMS release additionally requires
+`./scripts/check-release-readiness.sh`, which intentionally passes as a no-op
+while the bootstrap Git pin is active and only enforces signed release
+evidence — pinned upstream source, runtime and CLI checksums, and GitHub
+artifact attestation — once the dependency authority switches to
+`released-git`. It then requires network access and an authenticated GitHub
+CLI; use `AETHEREMS_OFFLINE_RELEASE_CHECK=1` only for narrow local script
+tests.

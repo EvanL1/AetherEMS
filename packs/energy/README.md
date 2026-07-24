@@ -80,5 +80,5 @@ the existing service are documented in
 [Power Forecasting](knowledge/power-forecasting.md). Installing this
 pack never starts a model or contacts a remote processor by itself. The
 opt-in implementations are the bounded
-[HTTP adapter](https://github.com/EvanL1/AetherEdge/blob/v0.5.0/extensions/http-data-processor/README.md) and
+[HTTP adapter](https://github.com/EvanL1/AetherEdge/blob/7c427f41dbe6a7780cb96a162f60fdc2a065cff5/extensions/http-data-processor/README.md) and
 [Load-Forecasting processor](../../processors/load-forecasting/README.md).

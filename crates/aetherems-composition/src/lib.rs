@@ -15,7 +15,7 @@ use thiserror::Error;
 /// AetherEdge kernel version consumed by this composition. The authority is
 /// `distribution/aetheriot-dependency.toml`; the release-readiness gate keeps
 /// this constant in sync with it.
-pub const AETHER_VERSION: &str = "0.5.0";
+pub const AETHER_VERSION: &str = "0.0.1";
 const ENERGY_PACK_MANIFEST: &str = include_str!("../../../packs/energy/pack.yaml");
 const ENERGY_IO_EXAMPLES: &str = include_str!("../../../packs/energy/examples/config/io/io.yaml");
 const ENERGY_AUTOMATION_EXAMPLE: &str =
@@ -500,7 +500,7 @@ mod tests {
 
     #[test]
     fn incompatible_aether_release_fails_closed() {
-        let manifest = ENERGY_PACK_MANIFEST.replacen(">=0.5.0,<0.6.0", ">=0.6.0,<0.7.0", 1);
+        let manifest = ENERGY_PACK_MANIFEST.replacen(">=0.0.1,<0.1.0", ">=0.1.0,<0.2.0", 1);
 
         let result = EnergyGateway::from_assets(
             &manifest,

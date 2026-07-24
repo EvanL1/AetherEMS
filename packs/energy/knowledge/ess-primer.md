@@ -79,7 +79,7 @@ A few point names are not self-explanatory: `Battery System` (%, `Battery.json`)
 | Nameplate data (rated power…) | Properties (P), static |
 | Field protocol (Modbus, IEC 104…) | Channel (one per device connection) |
 
-A product is a type; an instance is a device. Creating an instance from the `Battery` product gives it every P, M, and A point the template defines. Field data flows in through a channel (one per device connection) handled by io, which writes M points; control flows out through automation, which writes A points. The split is enforced by the architecture — see [Aether Data Model](https://github.com/EvanL1/AetherEdge/blob/v0.5.0/docs/concepts/data-model.md) for how instances and points are stored and addressed.
+A product is a type; an instance is a device. Creating an instance from the `Battery` product gives it every P, M, and A point the template defines. Field data flows in through a channel (one per device connection) handled by io, which writes M points; control flows out through automation, which writes A points. The split is enforced by the architecture — see [Aether Data Model](https://github.com/EvanL1/AetherEdge/blob/7c427f41dbe6a7780cb96a162f60fdc2a065cff5/docs/concepts/data-model.md) for how instances and points are stored and addressed.
 
 ## Standard information models
 
@@ -92,4 +92,4 @@ A product is a type; an instance is a device. Creating an instance from the `Bat
 - [Product Models](product-models.md) — the full product template reference and how to define your own
 - [Control Strategies](control-strategies.md) — how rules drive A points to implement peak shaving, demand response, and other strategies
 - [Safe Operations](safe-operations.md) — operating limits and the guardrails around writes
-- [Aether Data Model](https://github.com/EvanL1/AetherEdge/blob/v0.5.0/docs/concepts/data-model.md) — how products, instances, and points are stored and addressed at runtime
+- [Aether Data Model](https://github.com/EvanL1/AetherEdge/blob/7c427f41dbe6a7780cb96a162f60fdc2a065cff5/docs/concepts/data-model.md) — how products, instances, and points are stored and addressed at runtime

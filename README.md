@@ -13,11 +13,11 @@ names for API compatibility; `AetherEdge` is the repository and product identity
 > edge runtime — and the [documentation site](https://docs.aetheriot.dev/). This
 > repository is the energy-domain distribution built on top of it.
 
-> **Release status:** this repository is independently versioned and has no
-> local path or direct implementation-crate dependency on AetherEdge. It consumes
-> the single `aether-edge-sdk` façade from the exact signed AetherEdge `v0.5.0`
-> source release. Runtime, CLI, source, checksums, and provenance are recorded in
-> the downstream dependency authority described by ADR-0001.
+> **Migration status:** this repository is independently versioned and has no
+> local path dependency on AetherEdge. AetherEdge reset its release baseline to
+> `0.0.1` and withdrew its `v0.5.0` signed release, so development is pinned to
+> one immutable AetherEdge Git commit again. AetherEMS releases remain blocked
+> by ADR-0001 during this bootstrap window.
 
 ## Repository boundary
 

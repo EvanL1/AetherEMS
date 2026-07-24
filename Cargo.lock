@@ -4,8 +4,8 @@ version = 4
 
 [[package]]
 name = "aether-application"
-version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherEdge.git?rev=fbb9f3ecd52085072979461dd4a069c73d26397b#fbb9f3ecd52085072979461dd4a069c73d26397b"
+version = "0.0.1"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=7c427f41dbe6a7780cb96a162f60fdc2a065cff5#7c427f41dbe6a7780cb96a162f60fdc2a065cff5"
 dependencies = [
  "aether-data-processing",
  "aether-domain",
@@ -18,8 +18,8 @@ dependencies = [
 
 [[package]]
 name = "aether-data-processing"
-version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherEdge.git?rev=fbb9f3ecd52085072979461dd4a069c73d26397b#fbb9f3ecd52085072979461dd4a069c73d26397b"
+version = "0.0.1"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=7c427f41dbe6a7780cb96a162f60fdc2a065cff5#7c427f41dbe6a7780cb96a162f60fdc2a065cff5"
 dependencies = [
  "aether-domain",
  "chrono",
@@ -32,13 +32,13 @@ dependencies = [
 
 [[package]]
 name = "aether-domain"
-version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherEdge.git?rev=fbb9f3ecd52085072979461dd4a069c73d26397b#fbb9f3ecd52085072979461dd4a069c73d26397b"
+version = "0.0.1"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=7c427f41dbe6a7780cb96a162f60fdc2a065cff5#7c427f41dbe6a7780cb96a162f60fdc2a065cff5"
 
 [[package]]
 name = "aether-edge-sdk"
-version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherEdge.git?rev=fbb9f3ecd52085072979461dd4a069c73d26397b#fbb9f3ecd52085072979461dd4a069c73d26397b"
+version = "0.0.1"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=7c427f41dbe6a7780cb96a162f60fdc2a065cff5#7c427f41dbe6a7780cb96a162f60fdc2a065cff5"
 dependencies = [
  "aether-application",
  "aether-domain",
@@ -50,8 +50,8 @@ dependencies = [
 
 [[package]]
 name = "aether-pack"
-version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherEdge.git?rev=fbb9f3ecd52085072979461dd4a069c73d26397b#fbb9f3ecd52085072979461dd4a069c73d26397b"
+version = "0.0.1"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=7c427f41dbe6a7780cb96a162f60fdc2a065cff5#7c427f41dbe6a7780cb96a162f60fdc2a065cff5"
 dependencies = [
  "semver",
  "serde",
@@ -62,24 +62,29 @@ dependencies = [
 
 [[package]]
 name = "aether-ports"
-version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherEdge.git?rev=fbb9f3ecd52085072979461dd4a069c73d26397b#fbb9f3ecd52085072979461dd4a069c73d26397b"
+version = "0.0.1"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=7c427f41dbe6a7780cb96a162f60fdc2a065cff5#7c427f41dbe6a7780cb96a162f60fdc2a065cff5"
 dependencies = [
  "aether-domain",
  "async-trait",
+ "serde",
+ "zeroize",
 ]
 
 [[package]]
 name = "aether-store-local"
-version = "0.5.0"
-source = "git+https://github.com/EvanL1/AetherEdge.git?rev=fbb9f3ecd52085072979461dd4a069c73d26397b#fbb9f3ecd52085072979461dd4a069c73d26397b"
+version = "0.0.1"
+source = "git+https://github.com/EvanL1/AetherEdge.git?rev=7c427f41dbe6a7780cb96a162f60fdc2a065cff5#7c427f41dbe6a7780cb96a162f60fdc2a065cff5"
 dependencies = [
  "aether-domain",
  "aether-ports",
  "async-trait",
  "fs2",
+ "libc",
  "serde",
  "serde_json",
+ "sha2",
+ "thiserror",
  "tokio",
 ]
 
@@ -890,6 +895,12 @@ checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
 dependencies = [
  "windows-link",
 ]
+
+[[package]]
+name = "zeroize"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e13c156562582aa81c60cb29407084cdb54c4164760106ab78e6c5b0858cf64e"
 
 [[package]]
 name = "zmij"
