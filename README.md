@@ -10,7 +10,7 @@ names for API compatibility; `AetherEdge` is the repository and product identity
 
 > **New to AetherIoT?** Start with the
 > [AetherEdge README](https://github.com/EvanL1/AetherEdge#try-it-in-five-minutes) — the runnable
-> edge runtime — and the [documentation site](https://docs.aetheriot.dev/en/). This
+> edge runtime — and the [documentation site](https://docs.aetheriot.dev/). This
 > repository is the energy-domain distribution built on top of it.
 
 > **Release status:** this repository is independently versioned and has no
