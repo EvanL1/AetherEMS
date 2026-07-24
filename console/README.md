@@ -67,5 +67,5 @@ add it to the AetherEdge application boundary; do not expose a process port as a
 shortcut.
 
 See the AetherEdge guide
-[Build Applications with AI](https://docs.aetheriot.workers.dev/guides/build-applications-with-ai/)
+[Build Applications with AI](https://docs.aetheriot.dev/guides/build-applications-with-ai/)
 for the contract-first workflow.
