@@ -112,8 +112,24 @@ knowledge_count=$(find "$pack_root/knowledge" -maxdepth 1 -type f -name '*.md' |
 for index in mappings/index.yaml rules/index.yaml evaluations/index.yaml data-processing/tasks/index.yaml; do
     [[ -s "$pack_root/$index" ]] || fail "missing closed Pack index: $index"
 done
-[[ -s processors/load-forecasting/uv.lock ]] \
+processor_root=processors/load-forecasting
+processor_compose="$processor_root/deploy/docker-compose.data-processing.yaml"
+[[ -s "$processor_root/uv.lock" ]] \
     || fail "load-forecasting processor must commit its uv lockfile"
+if rg -n 'integrations/load-forecasting' "$processor_root" --glob '*.md' --glob '*.yaml'; then
+    fail "load-forecasting documentation still points at its former AetherEdge path"
+fi
+rg -Fq '127.0.0.1:${AETHER_LOAD_FORECASTING_PORT:-8989}:8989' "$processor_compose" \
+    || fail "load-forecasting Compose must publish only on host loopback"
+rg -q '^    internal: true$' "$processor_compose" \
+    || fail "load-forecasting Compose must deny default processor egress"
+rg -q '^    read_only: true$' "$processor_compose" \
+    || fail "load-forecasting Compose filesystem must be read-only"
+rg -q '^    cap_drop:$' "$processor_compose" \
+    || fail "load-forecasting Compose must drop Linux capabilities"
+rg -Fq 'AETHER_LOAD_FORECASTING_IMAGE:?set an immutable image reference with @sha256' \
+    "$processor_compose" \
+    || fail "load-forecasting Compose must require a digest-pinned image"
 rg -q '^  commissioned: false$' "$pack_root/pack.yaml" \
     || fail "Pack examples must be uncommissioned"
 rg -q '^auto_load_instances: false$' \

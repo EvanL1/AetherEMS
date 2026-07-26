@@ -10,7 +10,7 @@ const sourceFiles = (directory: string): string[] =>
     return statSync(absolute).isDirectory() ? sourceFiles(absolute) : [absolute]
   })
 
-describe('AetherIot application gateway boundary', () => {
+describe('AetherEdge application gateway boundary', () => {
   it('routes every Console HTTP call through the versioned aether-api surface', () => {
     const applicationSources = sourceFiles(path.join(consoleRoot, 'src'))
       .filter((file) => /\.(ts|vue)$/.test(file) && !file.includes(`${path.sep}__tests__${path.sep}`))

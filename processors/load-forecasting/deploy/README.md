@@ -15,10 +15,11 @@ explicitly:
 export AETHER_LOAD_FORECASTING_IMAGE=registry.example/load-forecasting@sha256:<digest>
 export AETHER_LOAD_FORECASTING_BEARER_TOKEN='<at least 32 allowed characters>'
 export AETHER_LOAD_FORECASTING_ARTIFACT_BUNDLES='<strict commissioned JSON array>'
-integrations/load-forecasting/deploy/validate-production-env.sh
+processors/load-forecasting/deploy/validate-production-env.sh
+AETHEREDGE_COMPOSE=/opt/AetherEdge/docker-compose.yml
 docker compose \
-  -f docker-compose.yml \
-  -f integrations/load-forecasting/deploy/docker-compose.data-processing.yaml \
+  -f "$AETHEREDGE_COMPOSE" \
+  -f processors/load-forecasting/deploy/docker-compose.data-processing.yaml \
   --profile data-processing \
   up -d aether-load-forecasting-processor aether-api
 ```

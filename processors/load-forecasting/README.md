@@ -256,8 +256,8 @@ print(
 ## Run and verify
 
 ```bash
-cd integrations/load-forecasting
-uv sync --all-groups
+cd processors/load-forecasting
+uv sync --locked --all-groups
 uv run ruff check .
 uv run pytest
 ```
