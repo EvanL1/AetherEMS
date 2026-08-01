@@ -1,5 +1,8 @@
 # AetherEMS
 
+**Product site:** [aetheriot.ai](https://aetheriot.ai/) ·
+**Developer site:** [aetheriot.dev](https://aetheriot.dev/)
+
 AetherEMS is the official energy-management implementation and distribution for
 the industry-neutral [AetherEdge](https://github.com/EvanL1/AetherEdge) edge
 kernel and SDK. This repository owns the Energy Pack, its fail-safe composition,

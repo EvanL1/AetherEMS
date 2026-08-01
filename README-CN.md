@@ -1,5 +1,8 @@
 # AetherEMS
 
+**产品站：** [aetheriot.ai](https://aetheriot.ai/) ·
+**开发者站：** [aetheriot.dev](https://aetheriot.dev/)
+
 AetherEMS 是行业中立 [AetherEdge](https://github.com/EvanL1/AetherEdge) IoT
 边缘内核与 SDK 的官方能源管理实现和发行版。本仓库拥有 Energy Pack、EMS 组合、可选
 Console 与 Processor、投运示例及下游一致性验证，不复制或 fork AetherEdge Kernel 源码。
