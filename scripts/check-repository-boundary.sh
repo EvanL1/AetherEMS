@@ -102,6 +102,12 @@ fi
 
 pack_root=packs/energy
 [[ -s "$pack_root/pack.yaml" ]] || fail "Energy Pack manifest is missing"
+if rg -n 'config\.template/' "$pack_root/pack.yaml"; then
+    fail "Energy Pack must own its examples rather than reference default config"
+fi
+if rg -n '^legacy_assets:' "$pack_root/pack.yaml"; then
+    fail "Energy Pack must not expose repository-relative legacy assets"
+fi
 if find "$pack_root" -type l -print -quit | grep -q .; then
     fail "Energy Pack contains a symlink"
 fi
@@ -109,6 +115,11 @@ model_count=$(find "$pack_root/models" -maxdepth 1 -type f -name '*.json' | wc -
 knowledge_count=$(find "$pack_root/knowledge" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')
 [[ "$model_count" == 13 ]] || fail "expected 13 Energy model files, found $model_count"
 [[ "$knowledge_count" == 5 ]] || fail "expected 5 Energy knowledge files, found $knowledge_count"
+preset="$pack_root/examples/config/api/calculated_points.sql"
+[[ -s "$preset" ]] || fail "Energy homepage commissioning preset is missing"
+preset_point_count=$(rg -c '^\(' "$preset" || true)
+[[ "$preset_point_count" == 19 ]] \
+    || fail "Energy homepage commissioning preset must preserve exactly 19 legacy points"
 for index in mappings/index.yaml rules/index.yaml evaluations/index.yaml data-processing/tasks/index.yaml; do
     [[ -s "$pack_root/$index" ]] || fail "missing closed Pack index: $index"
 done

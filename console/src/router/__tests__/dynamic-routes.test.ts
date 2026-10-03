@@ -29,10 +29,10 @@ describe('Dynamic Routes', () => {
     expect(alarmRoute?.children).toBeDefined()
   })
 
-  it('should contain control route', () => {
-    const controlRoute = dynamicRoutes.find((route) => route.path === '/control')
-    expect(controlRoute).toBeDefined()
-    expect(controlRoute?.meta?.title).toBe('Control')
+  it('keeps alarm rule management restricted to Admin', () => {
+    const alarmRoute = dynamicRoutes.find((route) => route.path === '/alarm')
+    const rulesRoute = alarmRoute?.children?.find((route) => route.name === 'ruleManagement')
+    expect(rulesRoute?.meta?.roles).toEqual(['Admin'])
   })
 
   it('should contain statistics route', () => {

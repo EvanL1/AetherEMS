@@ -38,13 +38,8 @@ export default defineConfig(async (env) => {
             'src/main.ts',
             // HTTP 客户端封装 — 通过 API 测试隐式覆盖，单独测试意义不大
             'src/utils/request.ts',
-            // 拖拽 / 布局 UI 工具 — 依赖真实 DOM 交互，不适合单测
-            'src/utils/useDnd.ts',
-            'src/utils/useLayout.ts',
             // 纯 Symbol 声明，无可测逻辑
             'src/utils/key.ts',
-            // 路由注入器 — 依赖完整 Vue Router + UserStore 上下文，不适合单测
-            'src/router/injector.ts',
             // 声明式路由表由结构测试覆盖；懒加载函数不是业务分支
             'src/router/dynamic-routes.ts',
             'src/router/static-routes.ts',

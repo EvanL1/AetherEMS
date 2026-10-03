@@ -1,13 +1,9 @@
-import { markRaw, defineAsyncComponent } from 'vue'
 import type { RouteItem } from '@/types/menu'
 import homeIcon from '@/assets/icons/sidebar-home.svg'
 import devicesIcon from '@/assets/icons/sidebar-devices.svg'
 import alarmIcon from '@/assets/icons/sidebar-alarm.svg'
-import controlIcon from '@/assets/icons/sidebar-control.svg'
 import statisticsIcon from '@/assets/icons/sidebar-statistics.svg'
 import settingIcon from '@/assets/icons/sidebar-setting.svg'
-
-// 工具：安全的异步组件（避免被代理）
 
 export const dynamicRoutes: RouteItem[] = [
   {
@@ -211,39 +207,6 @@ export const dynamicRoutes: RouteItem[] = [
     ],
   },
   {
-    path: '/control',
-    name: 'control',
-    meta: {
-      title: 'Control',
-      isSubMenu: true,
-      activeNav: '/control',
-      icon: controlIcon,
-      roles: ['Admin', 'Viewer', 'Engineer'],
-    },
-    children: [
-      {
-        path: 'controlRecord',
-        name: 'controlRecord',
-        component: () => import('@/views/Control/ControlRecord/index.vue'),
-        meta: {
-          title: 'Control Record',
-          activeNav: '/control/controlRecord',
-          roles: ['Admin', 'Viewer', 'Engineer'],
-        },
-      },
-      {
-        path: 'controlManagement',
-        name: 'controlManagement',
-        component: () => import('@/views/Control/ControlManagement/index.vue'),
-        meta: {
-          title: 'Control Management',
-          activeNav: '/control/controlManagement',
-          roles: ['Admin'],
-        },
-      },
-    ],
-  },
-  {
     path: '/statistics',
     name: 'statistics',
     // component: () => import('@/views/Statistics/index.vue'),
@@ -329,63 +292,6 @@ export const dynamicRoutes: RouteItem[] = [
           roles: ['Admin'],
         },
       },
-      /*
-      {
-        path: 'configuration',
-        name: 'configuration',
-        component: () => import('@/views/Setting/Configuration/index.vue'),
-        redirect: '/setting/configuration/channelConfiguration',
-        meta: {
-          title: 'Configuration',
-          activeNav: '/setting/configuration',
-          roles: ['Admin'],
-        },
-        children: [
-          {
-            path: 'channelConfiguration',
-            name: 'channelConfiguration',
-            component: () => import('@/views/Setting/Configuration/ChannelConfiguration/index.vue'),
-            meta: {
-              title: 'Channel Configuration',
-              activeNav: '/setting/configuration',
-              roles: ['Admin'],
-            },
-          },
-          {
-            path: 'modelConfiguration',
-            name: 'modelConfiguration',
-            component: () => import('@/views/Setting/Configuration/DeviceConfiguration/index.vue'),
-            meta: {
-              title: 'Model Configuration',
-              activeNav: '/setting/configuration',
-              roles: ['Admin'],
-            },
-          },
-          {
-            path: 'ruleConfiguration',
-            name: 'ruleConfiguration',
-            component: () => import('@/views/Setting/Configuration/RuleConfiguration/index.vue'),
-
-            meta: {
-              title: 'Rule Configuration',
-              activeNav: '/setting/configuration',
-              roles: ['Admin'],
-            },
-          },
-          {
-            path: 'ruleChainEditor/:id',
-            name: 'ruleChainEditor',
-            component: () =>
-              import('@/views/Setting/Configuration/RuleConfiguration/RuleChainEditorView.vue'),
-            meta: {
-              title: 'Rule Chain Editor',
-              activeNav: '/setting/configuration',
-              roles: ['Admin'],
-            },
-          },
-        ],
-      },
-      */
     ],
   },
 ]

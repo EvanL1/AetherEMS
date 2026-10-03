@@ -1,7 +1,7 @@
 ---
 title: Control Strategies as Rules
 description: Expressing SOC management, peak shaving, and demand control as executable rule flows
-updated: 2026-07-10
+updated: 2026-10-03
 ---
 
 # Control Strategies as Rules
@@ -203,6 +203,7 @@ What a strategy author can rely on:
   execution: the flow is evaluated, and whichever
   actions the conditions select are dispatched through shared memory to io
   and on to the device. There is no test or dry-run endpoint. Trial a
-  new strategy against a Virtual-protocol channel first (see
+  new strategy against an isolated channel connected to the external
+  `tools/simulator` process first (see
   [Connect Devices](https://github.com/EvanL1/AetherEdge/blob/7c427f41dbe6a7780cb96a162f60fdc2a065cff5/docs/guides/connect-devices.md)) before pointing it at
   real hardware.
