@@ -1,7 +1,7 @@
 ---
 title: Safe Operations for AI Agents
 description: Which writes reach real devices, how write gating works, and the operating rules an AI agent must follow
-updated: 2026-07-12
+updated: 2026-10-03
 ---
 
 # Safe Operations for AI Agents
@@ -109,6 +109,11 @@ a live-state writer to recreate one. `channels_write` is disabled by default at
 the io service and
 returns 403 unless the operator explicitly starts io with
 `AETHER_ALLOW_SIMULATION_WRITES=true` in an isolated development environment.
+
+For strategy trials, prefer the external `tools/simulator` process connected
+through an isolated IO adapter. The pinned AetherEdge revision (`7c427f4`) still
+contains the development simulation-write path described above; leave
+`AETHER_ALLOW_SIMULATION_WRITES` unset on commissioned deployments.
 
 ### Remaining configuration mutations stay excluded from MCP
 

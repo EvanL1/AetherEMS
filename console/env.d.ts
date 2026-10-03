@@ -22,8 +22,3 @@ declare module 'postcss-pxtorem' {
   function pxtorem(options?: PxtoremOptions): any
   export = pxtorem
 }
-declare module 'v-fit-columns' {
-  import type { Plugin } from 'vue'
-  const vFitColumns: Plugin
-  export default vFitColumns
-}

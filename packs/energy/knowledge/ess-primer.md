@@ -1,7 +1,7 @@
 ---
 title: Energy Storage Primer
 description: How ESS concepts - PCS, BMS, SOC, grid interface - map onto Aether products, instances, and points
-updated: 2026-07-12
+updated: 2026-10-03
 ---
 
 # Energy Storage Primer
@@ -83,9 +83,9 @@ A product is a type; an instance is a device. Creating an instance from the `Bat
 
 ## Standard information models
 
-**Field protocols.** io speaks 14 protocols: Modbus TCP/RTU, IEC 60870-5-104, IEC 61850 (MMS), OPC UA, MQTT, HTTP, DL/T 645, CAN/J1939, GPIO, BLE, Zigbee, Matter, Aether-485, and Virtual. Which of these are compiled into a given binary is controlled by Cargo feature flags on io.
+**Field protocols.** Available IO adapters depend on the deployed runtime manifest and Cargo feature selection. For isolated strategy trials, `tools/simulator` runs as a separate process and sends protocol traffic through a composed IO adapter. The pinned AetherEdge revision also contains development Virtual channels; a protocol name alone is not evidence that a deployed runtime enables it.
 
-**SunSpec.** The `aether-model` crate embeds SunSpec model definitions at compile time and exposes them through its `sunspec` module: `load_model(model_id)` parses an embedded model, `list_model_ids()` enumerates what is available, and `model_exists(model_id)` checks for one. `expand_model` walks a model's group tree and produces Modbus-ready point definitions (`ExpandedPoint` with signal name, register address, data type, unit, scale, and offset), so a SunSpec-compliant inverter or meter can be mapped to channel points without hand-writing a register table. An `ExpandFilter` controls whether static/nameplate points, scale-factor registers, and optional points are included.
+**SunSpec.** In the pinned AetherEdge revision (`7c427f4`), the `aether-model` crate embeds SunSpec model definitions at compile time and exposes them through its `sunspec` module: `load_model(model_id)` parses an embedded model, `list_model_ids()` enumerates what is available, and `model_exists(model_id)` checks for one. `expand_model` walks a model's group tree and produces Modbus-ready point definitions (`ExpandedPoint` with signal name, register address, data type, unit, scale, and offset), so a SunSpec-compliant inverter or meter can be mapped to channel points without hand-writing a register table. An `ExpandFilter` controls whether static/nameplate points, scale-factor registers, and optional points are included.
 
 ## Where to go next
 

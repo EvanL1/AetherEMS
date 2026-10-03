@@ -98,6 +98,19 @@ fn yaml_value(path: &Path) -> serde_json::Value {
     .unwrap_or_else(|error| panic!("cannot parse {}: {error}", path.display()))
 }
 
+fn instance_example_files(directory: &Path) -> Vec<PathBuf> {
+    let mut files = Vec::new();
+    for entry in fs::read_dir(directory).expect("read instance example directory") {
+        let path = entry.expect("instance example entry").path();
+        if path.is_dir() {
+            files.extend(instance_example_files(&path));
+        } else if path.extension().and_then(|value| value.to_str()) == Some("yaml") {
+            files.push(path);
+        }
+    }
+    files
+}
+
 #[test]
 fn energy_pack_declares_complete_formal_asset_directories() {
     let root = repository_pack_root();
@@ -206,9 +219,28 @@ fn formal_energy_assets_retain_versioned_fail_safe_payloads() {
     );
     let automation = yaml_value(&root.join("examples/config/automation/automation.yaml"));
     assert_eq!(automation["auto_load_instances"], false);
-    let instance =
-        yaml_value(&root.join("examples/config/automation/instances/diesel_gen_01/instance.yaml"));
-    assert_eq!(instance["instance"]["enabled"], false);
+    let instances = yaml_value(&root.join("examples/config/automation/instances.yaml"));
+    let instances = instances["instances"]
+        .as_object()
+        .expect("instance catalog");
+    assert!(!instances.is_empty());
+    for (name, instance) in instances {
+        assert_eq!(
+            instance["enabled"], false,
+            "instance {name} must be disabled"
+        );
+    }
+    let instance_files = instance_example_files(&root.join("examples/config/automation/instances"));
+    assert!(!instance_files.is_empty());
+    for path in instance_files {
+        let instance = yaml_value(&path);
+        assert_eq!(
+            instance["instance"]["enabled"],
+            false,
+            "instance example {} must be disabled",
+            path.display()
+        );
+    }
 
     let aliases = yaml_value(&root.join("mappings/product-name-aliases.yaml"));
     assert_eq!(aliases["schema"], "aether.pack.mapping-set.v1");
@@ -238,13 +270,19 @@ fn formal_energy_assets_retain_versioned_fail_safe_payloads() {
             .is_some_and(|entries| entries.iter().all(|entry| entry["enabled"] == false))
     );
 
-    let rule: serde_json::Value = serde_json::from_slice(
-        &fs::read(root.join("rules/battery_soc_management.json")).expect("read rule"),
-    )
-    .expect("parse rule");
-    assert_eq!(rule["schema"], "aether.pack.rule.v1");
-    assert_eq!(rule["enabled"], false);
-    assert_eq!(rule["commissioned"], false);
+    let rules = file_names(&root.join("rules"), "json");
+    assert!(!rules.is_empty());
+    for name in rules {
+        let rule: serde_json::Value =
+            serde_json::from_slice(&fs::read(root.join("rules").join(&name)).expect("read rule"))
+                .expect("parse rule");
+        assert_eq!(rule["schema"], "aether.pack.rule.v1");
+        assert_eq!(rule["enabled"], false, "rule {name} must be disabled");
+        assert_eq!(
+            rule["commissioned"], false,
+            "rule {name} must be uncommissioned"
+        );
+    }
 
     let evaluation = yaml_value(&root.join("evaluations/pack-safety.yaml"));
     assert_eq!(evaluation["schema"], "aether.pack.evaluation-suite.v1");

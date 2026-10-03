@@ -10,6 +10,7 @@ instances:
   pcs_01:
     product_name: PCS
     name: "PCS #1"
+    enabled: false
     properties:
       rated_power: 500.0        # kW
       rated_voltage: 380.0      # V
@@ -22,6 +23,7 @@ instances:
   pv_01:
     product_name: PVInverter
     name: "PV System #1"
+    enabled: false
     properties:
       rated_power: 500.0        # kW
       max_dc_voltage: 1000.0    # V
@@ -34,6 +36,7 @@ instances:
   battery_01:
     product_name: Battery
     name: "Battery Pack #1"
+    enabled: false
     properties:
       total_capacity: 860.0     # kWh
       nominal_voltage: 768.0    # V
@@ -46,6 +49,7 @@ instances:
   diesel_gen_01:
     product_name: Diesel
     name: "Diesel Generator #1"
+    enabled: false
     properties:
       rated_power: 500.0        # kW
       rated_voltage: 400.0      # V

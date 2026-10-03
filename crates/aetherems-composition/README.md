@@ -17,9 +17,9 @@ known-future covariates, no live tail, and an explicitly labeled persistence
 fallback.
 
 ```bash
-cargo run -p aether-example-energy-gateway
-cargo test -p aether-example-energy-gateway --test composition_contract
-cargo test -p aether-example-energy-gateway --test data_processing_composition
+cargo run -p aetherems-composition
+cargo test -p aetherems-composition --test composition_contract
+cargo test -p aetherems-composition --test data_processing_composition
 ```
 
 This is a composition and conformance proof, not the six-process production

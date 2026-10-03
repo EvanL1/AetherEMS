@@ -51,9 +51,9 @@ database.
 Run the fail-safe distribution proof from the repository root:
 
 ```bash
-cargo run -p aether-example-energy-gateway
-cargo test -p aether-example-energy-gateway --test pack_artifact_contract
-cargo test -p aether-example-energy-gateway --test data_processing_composition
+cargo run -p aetherems-composition
+cargo test -p aetherems-composition --test pack_artifact_contract
+cargo test -p aetherems-composition --test data_processing_composition
 ```
 
 This validates and reports the bundled energy capabilities but does not start
