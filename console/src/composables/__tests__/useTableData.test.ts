@@ -53,6 +53,8 @@ describe('useTableData', () => {
   it('should initialize with default values', async () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.get).mockResolvedValue({
+      code: 200,
+      message: 'OK',
       success: true,
       data: { list: [], total: 0 },
     })
@@ -74,6 +76,8 @@ describe('useTableData', () => {
 
   it('should fetch table data successfully', async () => {
     const mockResponse = {
+      code: 200,
+      message: 'OK',
       success: true,
       data: {
         list: [{ id: 1, name: 'test' }],
@@ -99,6 +103,8 @@ describe('useTableData', () => {
 
   it('should include filters in query params when fetching data', async () => {
     const mockResponse = {
+      code: 200,
+      message: 'OK',
       success: true,
       data: { list: [], total: 0 },
     }
@@ -126,6 +132,8 @@ describe('useTableData', () => {
 
   it('should handle pagination changes', async () => {
     const mockResponse = {
+      code: 200,
+      message: 'OK',
       success: true,
       data: { list: [], total: 0 },
     }
@@ -151,7 +159,7 @@ describe('useTableData', () => {
   })
 
   it('should handle delete row', async () => {
-    const mockResponse = { success: true }
+    const mockResponse = { code: 200, message: 'OK', success: true, data: null }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.delete).mockResolvedValue(mockResponse)
     const { ElMessageBox } = await import('element-plus')
@@ -176,6 +184,8 @@ describe('useTableData', () => {
 
   it('should clear filters and keyword when reloading filters', async () => {
     const mockResponse = {
+      code: 200,
+      message: 'OK',
       success: true,
       data: { list: [], total: 0 },
     }
@@ -225,7 +235,12 @@ describe('useTableData', () => {
 
   it('applies and clears sorting, then resets pagination and filters', async () => {
     const { Request } = await import('@/utils/request')
-    vi.mocked(Request.get).mockResolvedValue({ success: true, data: { list: [], total: 0 } })
+    vi.mocked(Request.get).mockResolvedValue({
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { list: [], total: 0 },
+    })
 
     let api!: ReturnType<typeof useTableData>
     const wrapper = mountComposable((exposed) => {
@@ -260,7 +275,12 @@ describe('useTableData', () => {
 
   it('warns when delete, batch delete, and export capabilities are unavailable', async () => {
     const { Request } = await import('@/utils/request')
-    vi.mocked(Request.get).mockResolvedValue({ success: true, data: { list: [], total: 0 } })
+    vi.mocked(Request.get).mockResolvedValue({
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { list: [], total: 0 },
+    })
     const { ElMessage, ElMessageBox } = await import('element-plus')
 
     let api!: ReturnType<typeof useTableData>
@@ -284,9 +304,19 @@ describe('useTableData', () => {
 
   it('batch deletes selected rows and exports the active filtered query', async () => {
     const { Request } = await import('@/utils/request')
-    vi.mocked(Request.get).mockResolvedValue({ success: true, data: { list: [], total: 0 } })
-    vi.mocked(Request.post).mockResolvedValue({ success: true } as any)
-    vi.mocked(Request.download).mockResolvedValue(undefined as any)
+    vi.mocked(Request.get).mockResolvedValue({
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { list: [], total: 0 },
+    })
+    vi.mocked(Request.post).mockResolvedValue({
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: null,
+    })
+    vi.mocked(Request.download).mockResolvedValue(undefined)
     const { ElMessageBox, ElMessage } = await import('element-plus')
     vi.mocked(ElMessageBox.confirm).mockResolvedValue('confirm' as any)
 

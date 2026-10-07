@@ -12,7 +12,12 @@ vi.mock('@/utils/request', () => ({
 
 describe('User Management API', () => {
   it('should get user list', async () => {
-    const mockData = { users: [], total: 0 }
+    const mockData = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { users: [], total: 0 },
+    }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.get).mockResolvedValue(mockData)
 
@@ -23,7 +28,7 @@ describe('User Management API', () => {
   })
 
   it('should add user', async () => {
-    const mockData = { success: true, user: { id: 1 } }
+    const mockData = { code: 200, message: 'OK', success: true, data: { user: { id: 1 } } }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
@@ -34,7 +39,7 @@ describe('User Management API', () => {
   })
 
   it('should update user', async () => {
-    const mockData = { success: true }
+    const mockData = { code: 200, message: 'OK', success: true, data: null }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.put).mockResolvedValue(mockData)
 
@@ -45,7 +50,7 @@ describe('User Management API', () => {
   })
 
   it('should delete user', async () => {
-    const mockData = { success: true }
+    const mockData = { code: 200, message: 'OK', success: true, data: null }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.delete).mockResolvedValue(mockData)
 

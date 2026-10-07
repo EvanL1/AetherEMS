@@ -16,6 +16,7 @@ import type {
   SubscribeMessage,
   UnsubscribeMessage,
   PingMessage,
+  PongMessage,
   UnsubscribeAckMessage,
 } from '@/types/websocket'
 
@@ -47,9 +48,9 @@ class WebSocketManager {
   private ws: WebSocket | null = null
   private config: WebSocketConfig
   private reconnectAttempts = 0
-  private heartbeatTimer: number | null = null
-  private heartbeatTimeoutTimer: number | null = null
-  private reconnectTimer: number | null = null
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null
+  private heartbeatTimeoutTimer: ReturnType<typeof setTimeout> | null = null
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
   private messageIdCounter = 0
   private isManualDisconnect = false
   private connectingPromise: Promise<void> | null = null // 连接 Promise 缓存，避免并发调用
@@ -471,7 +472,7 @@ class WebSocketManager {
         this.handleDataUpdate((message as any).data)
         break
       case 'data_batch':
-        this.handleBatchDataUpdate((message as any).data, message.timestamp)
+        this.handleBatchDataUpdate(message.data, message.timestamp)
         break
       case 'alarm':
         this.handleAlarm((message as any).data)
@@ -486,13 +487,13 @@ class WebSocketManager {
         this.handleServerError((message as any).data)
         break
       case 'pong':
-        this.handlePong((message as any).data)
+        this.handlePong(message.data)
         break
       case 'alarm_num':
         this.handleAlarmNum((message as any).data)
         break
       case 'homepage_batch':
-        this.handleHomepageBatch((message as any).data, (message as any).timestamp)
+        this.handleHomepageBatch(message.data, message.timestamp)
         break
       default:
         console.warn('[WebSocket] 未知消息类型:', (message as any).type)
@@ -514,7 +515,7 @@ class WebSocketManager {
   }
 
   /** 处理批量数据更新 */
-  private handleBatchDataUpdate(data: any, timestamp: string): void {
+  private handleBatchDataUpdate(data: any, timestamp: number): void {
     this.subscriptions.forEach((record) => {
       if (record.config.source === 'homepage') {
         // homepage 类型：直接透传数据
@@ -572,10 +573,10 @@ class WebSocketManager {
   }
 
   /** 处理 homepage_batch：首页点位批量推送 */
-  private handleHomepageBatch(data: any, timestamp?: number | string): void {
+  private handleHomepageBatch(data: any, timestamp: number): void {
     this.subscriptions.forEach((record) => {
       if (record.config.source === 'homepage') {
-        record.listeners.onBatchDataUpdate?.(data, String(timestamp ?? ''))
+        record.listeners.onBatchDataUpdate?.(data, timestamp)
       }
     })
   }
@@ -604,8 +605,8 @@ class WebSocketManager {
   }
 
   /** 处理心跳响应 */
-  private handlePong(data: any): void {
-    this.connectionStats.latency = data.latency
+  private handlePong(data: PongMessage['data']): void {
+    this.connectionStats.latency = data.latency_ms
     if (this.heartbeatTimeoutTimer) {
       clearTimeout(this.heartbeatTimeoutTimer)
       this.heartbeatTimeoutTimer = null

@@ -13,7 +13,7 @@ vi.mock('@/utils/request', () => {
 
 describe('api/Statistic/overview.ts', () => {
   it('queries power trend with the provided params', async () => {
-    const mockData = { success: true, data: { series: [] } }
+    const mockData = { code: 200, message: 'OK', success: true, data: { series: [] } }
     const RequestModule = await import('@/utils/request')
     vi.mocked(RequestModule.default.get).mockResolvedValue(mockData)
 
