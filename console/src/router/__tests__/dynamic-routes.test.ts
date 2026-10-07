@@ -39,6 +39,17 @@ describe('Dynamic Routes', () => {
     const statisticsRoute = dynamicRoutes.find((route) => route.path === '/statistics')
     expect(statisticsRoute).toBeDefined()
     expect(statisticsRoute?.meta?.title).toBe('Statistics')
+    expect(statisticsRoute?.redirect).toBe('/statistics/overview')
+    expect(statisticsRoute?.children?.map((route) => route.path)).toEqual([
+      'overview',
+      'curves',
+      'operationLog',
+      'runingLog',
+    ])
+    for (const route of statisticsRoute?.children ?? []) {
+      expect(typeof route.component).toBe('function')
+      expect(route.meta?.roles).toEqual(['Admin', 'Viewer', 'Engineer'])
+    }
   })
 
   it('should contain setting route', () => {

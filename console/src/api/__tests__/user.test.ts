@@ -54,6 +54,50 @@ describe('User API', () => {
     expect(Request.get).toHaveBeenCalledWith('/api/v1/auth/me')
   })
 
+  it('refreshes tokens without recursively triggering the refresh interceptor', async () => {
+    const response = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: {
+        access_token: 'new-access-token',
+        refresh_token: 'new-refresh-token',
+        token_type: 'Bearer',
+        expires_in: 3600,
+      },
+    }
+    const { Request } = await import('@/utils/request')
+    vi.mocked(Request.post).mockResolvedValueOnce(response)
+
+    await expect(userApi.refreshToken('current-refresh-token')).resolves.toBe(response)
+
+    expect(Request.post).toHaveBeenLastCalledWith(
+      '/api/v1/auth/refresh',
+      { refresh_token: 'current-refresh-token' },
+      { _isRefreshTokenRequest: true },
+    )
+  })
+
+  it('gets the selected user detail', async () => {
+    const response = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: {
+        id: 7,
+        username: 'selected-user',
+        is_active: true,
+        role: { id: 1, name_en: 'Admin', name_zh: '管理员', description: '' },
+      },
+    }
+    const { Request } = await import('@/utils/request')
+    vi.mocked(Request.get).mockResolvedValueOnce(response)
+
+    await expect(userApi.getUserDetail(7)).resolves.toBe(response)
+
+    expect(Request.get).toHaveBeenLastCalledWith('/api/v1/auth/users/7')
+  })
+
   it('should add user', async () => {
     const mockData = { success: true, data: { id: 1, username: 'newuser' } }
     const { Request } = await import('@/utils/request')

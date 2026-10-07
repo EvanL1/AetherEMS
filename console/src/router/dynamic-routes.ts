@@ -209,7 +209,6 @@ export const dynamicRoutes: RouteItem[] = [
   {
     path: '/statistics',
     name: 'statistics',
-    // component: () => import('@/views/Statistics/index.vue'),
     redirect: '/statistics/overview',
     meta: {
       isSubMenu: true,

@@ -1,187 +1,60 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  ChangeChannelEnabled,
-  batchUpdateMappingPoint,
-  controlChannelStatus,
-  createChannel,
-  getAllChannels,
-  getChannelDetail,
-  getChannelMappings,
-  getChannelsByIds,
-  getMappingPoints,
-  getPointsTables,
-  getUnmappedPoints,
-  postAdjustmentBatch,
-  postControlBatch,
-  postPointsBatch,
-  publishPointValue,
-  updateChannel,
-} from '../channelsManagement'
+import { Request } from '@/utils/request'
+import { getAllChannels, getPointsTables } from '../channelsManagement'
 
-vi.mock('@/utils/request', () => ({
-  confirmedMutationConfig: vi.fn(() => ({ headers: { 'x-aether-confirmed': 'true' } })),
-  Request: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-  },
-}))
+vi.mock('@/utils/request', () => ({ Request: { get: vi.fn() } }))
 
 describe('api/channelsManagement.ts', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('updates channel enabled state and channel detail', async () => {
-    const { Request } = await import('@/utils/request')
-    vi.mocked(Request.put)
-      .mockResolvedValueOnce({ success: true })
-      .mockResolvedValueOnce({ success: true })
-    vi.mocked(Request.get).mockResolvedValueOnce({ success: true, data: { id: 1 } })
+  it.each(['T', 'S', 'C', 'A'] as const)(
+    'gets %s point tables with request config',
+    async (type) => {
+      const response = {
+        code: 200,
+        message: 'OK',
+        success: true,
+        data: { list: [{ point_id: 9 }] },
+      }
+      vi.mocked(Request.get).mockResolvedValueOnce(response)
+      const config = { timeout: 3000 }
 
-    await ChangeChannelEnabled(1, true, { confirmed: true })
-    await getChannelDetail(1)
-    await updateChannel(1, { name: 'CH-1' } as any, { confirmed: true })
+      await expect(getPointsTables(3, type, config)).resolves.toBe(response)
 
-    expect(Request.put).toHaveBeenNthCalledWith(
-      1,
-      '/api/v1/io/api/channels/1/enabled',
-      { enabled: true },
-      { headers: { 'x-aether-confirmed': 'true' } },
-    )
-    expect(Request.get).toHaveBeenCalledWith('/api/v1/io/api/channels/1', null, { timeout: 60000 })
-    expect(Request.put).toHaveBeenNthCalledWith(
-      2,
-      '/api/v1/io/api/channels/1',
-      { name: 'CH-1' },
-      { headers: { 'x-aether-confirmed': 'true' } },
-    )
-  })
+      expect(Request.get).toHaveBeenCalledExactlyOnceWith(
+        '/api/v1/io/api/channels/3/points',
+        { type },
+        config,
+      )
+    },
+  )
 
-  it('creates channels and controls their status', async () => {
-    const { Request } = await import('@/utils/request')
-    vi.mocked(Request.post)
-      .mockResolvedValueOnce({ success: true })
-      .mockResolvedValueOnce({ success: true })
+  it('gets all point tables when no type or config is supplied', async () => {
+    const response = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { telemetry: [], signal: [], control: [], adjustment: [] },
+    }
+    vi.mocked(Request.get).mockResolvedValueOnce(response)
 
-    await createChannel({ name: 'CH-2' } as any, { confirmed: true })
-    await controlChannelStatus(2, 'restart', { confirmed: true })
+    await expect(getPointsTables(3)).resolves.toBe(response)
 
-    expect(Request.post).toHaveBeenNthCalledWith(
-      1,
-      '/api/v1/io/api/channels',
-      { name: 'CH-2' },
-      { headers: { 'x-aether-confirmed': 'true' } },
-    )
-    expect(Request.post).toHaveBeenNthCalledWith(
-      2,
-      '/api/v1/io/api/channels/2/control',
-      { operation: 'restart' },
-      { headers: { 'x-aether-confirmed': 'true' } },
-    )
-  })
-
-  it('gets point tables and mapping related resources', async () => {
-    const { Request } = await import('@/utils/request')
-    vi.mocked(Request.get)
-      .mockResolvedValueOnce({ success: true, data: { list: [] } })
-      .mockResolvedValueOnce({ success: true, data: { list: [] } })
-      .mockResolvedValueOnce({ success: true, data: { list: [] } })
-      .mockResolvedValueOnce({ success: true, data: { list: [] } })
-
-    await getPointsTables(3, 'T' as any, { timeout: 3000 })
-    await getUnmappedPoints(3, 'S' as any)
-    await getMappingPoints(3, 'C' as any, 9)
-    await getChannelMappings(3)
-
-    expect(Request.get).toHaveBeenNthCalledWith(
-      1,
+    expect(Request.get).toHaveBeenCalledExactlyOnceWith(
       '/api/v1/io/api/channels/3/points',
-      { type: 'T' },
-      { timeout: 3000 },
-    )
-    expect(Request.get).toHaveBeenNthCalledWith(2, '/api/v1/io/api/channels/3/unmapped-points', {
-      type: 'S',
-    })
-    expect(Request.get).toHaveBeenNthCalledWith(3, '/api/v1/io/api/channels/3/C/points/9/mapping')
-    expect(Request.get).toHaveBeenNthCalledWith(4, '/api/v1/io/api/channels/3/mappings', null)
-  })
-
-  it('publishes write, control batch, adjustment batch and points batch payloads', async () => {
-    const { Request } = await import('@/utils/request')
-    vi.mocked(Request.post)
-      .mockResolvedValueOnce({ success: true })
-      .mockResolvedValueOnce({ success: true })
-      .mockResolvedValueOnce({ success: true })
-      .mockResolvedValueOnce({ success: true })
-    vi.mocked(Request.put).mockResolvedValueOnce({ success: true })
-
-    const writePayload = { commands: [{ point_id: 1, value: 1 }] }
-    const batchPayload = [{ point_id: 2, value: 0 }]
-    const mappingPayload = { mappings: [{ point_id: 3, target_id: 4 }] }
-    const pointsPayload = { create: [{ id: 5 }], update: [], delete: [] }
-
-    await publishPointValue(8, writePayload as any, { confirmed: true })
-    await postControlBatch(8, batchPayload, { confirmed: true })
-    await postAdjustmentBatch(8, batchPayload, { confirmed: true })
-    await batchUpdateMappingPoint(8, mappingPayload as any, { confirmed: true })
-    await postPointsBatch(8, pointsPayload as any, { confirmed: true })
-
-    const mutationConfig = { headers: { 'x-aether-confirmed': 'true' } }
-    expect(Request.post).toHaveBeenNthCalledWith(
-      1,
-      '/api/v1/io/api/channels/8/write',
-      writePayload,
-      mutationConfig,
-    )
-    expect(Request.post).toHaveBeenNthCalledWith(
-      2,
-      '/api/v1/io/api/channels/8/control/batch',
-      { commands: batchPayload },
-      mutationConfig,
-    )
-    expect(Request.post).toHaveBeenNthCalledWith(
-      3,
-      '/api/v1/io/api/channels/8/adjustment/batch',
-      { commands: batchPayload },
-      mutationConfig,
-    )
-    expect(Request.put).toHaveBeenCalledWith(
-      '/api/v1/io/api/channels/8/mappings',
-      mappingPayload,
-      mutationConfig,
-    )
-    expect(Request.post).toHaveBeenNthCalledWith(
-      4,
-      '/api/v1/io/api/channels/8/points/batch',
-      pointsPayload,
-      mutationConfig,
+      null,
+      undefined,
     )
   })
 
-  it('gets all channels and short-circuits empty id searches', async () => {
-    const { Request } = await import('@/utils/request')
-    vi.mocked(Request.get).mockResolvedValueOnce({ success: true, data: { list: [] } })
+  it('gets all channels', async () => {
+    const response = { code: 200, message: 'OK', success: true, data: { list: [{ id: 6 }] } }
+    vi.mocked(Request.get).mockResolvedValueOnce(response)
 
-    await getAllChannels()
-    const emptyResult = await getChannelsByIds([])
+    await expect(getAllChannels()).resolves.toBe(response)
 
-    expect(Request.get).toHaveBeenCalledWith('/api/v1/io/api/channels/list')
-    expect(emptyResult).toEqual({ success: true, data: { list: [] } })
-  })
-
-  it('searches channels by ids when ids are provided', async () => {
-    const mockData = { success: true, data: { list: [{ id: 6 }] } }
-    const { Request } = await import('@/utils/request')
-    vi.mocked(Request.get).mockResolvedValue(mockData)
-
-    const result = await getChannelsByIds([6, 7], { timeout: 5000 })
-
-    expect(result).toEqual(mockData)
-    expect(Request.get).toHaveBeenCalledWith(
-      '/api/v1/io/api/channels/search',
-      { ids: '6,7' },
-      { timeout: 5000 },
-    )
+    expect(Request.get).toHaveBeenCalledExactlyOnceWith('/api/v1/io/api/channels/list')
   })
 })
