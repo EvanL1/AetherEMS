@@ -37,8 +37,7 @@ type ColumnDef = {
 }
 
 type FitColumnsBinding =
-  | number
-  | { padding?: number; observe?: 'data' | 'layout'; columns?: ColumnDef[] }
+  number | { padding?: number; observe?: 'data' | 'layout'; columns?: ColumnDef[] }
 
 function getPadding(binding: DirectiveBinding<FitColumnsBinding>): number {
   // 内部一律以 px 计算，默认 padding 按 0.18rem => 18px
@@ -332,9 +331,9 @@ const debounceDirective = {
 
     let handler = fn
     if (modifiers.debounce) {
-      let timer: number | null = null
+      let timer: ReturnType<typeof setTimeout> | undefined
       handler = (...args: any[]) => {
-        clearTimeout(timer as number)
+        clearTimeout(timer)
         timer = setTimeout(() => fn(...args), delay)
       }
     }

@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { ListenerConfig, SubscriptionConfig } from '@/types/websocket'
+import type {
+  HomepageBatchMessage,
+  ListenerConfig,
+  PongMessage,
+  SubscriptionConfig,
+} from '@/types/websocket'
 
 type UserState = {
   isLoggedIn: boolean
@@ -152,6 +157,49 @@ describe('utils/websocket.ts', () => {
     wsManager.disconnect()
   })
 
+  it('preserves numeric server timestamps in homepage batches', async () => {
+    const { wsManager } = await loadManager()
+    const onBatchDataUpdate = vi.fn()
+    wsManager.subscribe({ source: 'homepage', interval: 2000 }, { onBatchDataUpdate })
+
+    const connectPromise = wsManager.connect()
+    const socket = MockWebSocket.instances[0]
+    socket.readyState = MockWebSocket.OPEN
+    socket.onopen?.({} as Event)
+    await connectPromise
+
+    const message: HomepageBatchMessage = {
+      id: 'homepage-1',
+      type: 'homepage_batch',
+      timestamp: 1776124800,
+      data: { updates: [{ id: 1, name: 'Power', values: 42, unit: 'kW' }] },
+    }
+    socket.onmessage?.({ data: JSON.stringify(message) } as MessageEvent)
+
+    expect(onBatchDataUpdate).toHaveBeenCalledExactlyOnceWith(message.data, message.timestamp)
+    wsManager.disconnect()
+  })
+
+  it('reads the server heartbeat latency_ms field', async () => {
+    const { wsManager } = await loadManager()
+    const connectPromise = wsManager.connect()
+    const socket = MockWebSocket.instances[0]
+    socket.readyState = MockWebSocket.OPEN
+    socket.onopen?.({} as Event)
+    await connectPromise
+
+    const message: PongMessage = {
+      id: 'ping-1',
+      type: 'pong',
+      timestamp: 1776124800,
+      data: { latency_ms: 0 },
+    }
+    socket.onmessage?.({ data: JSON.stringify(message) } as MessageEvent)
+
+    expect(wsManager.connectionStats.latency).toBe(0)
+    wsManager.disconnect()
+  })
+
   it('dispatches batch, alarm, error and alarm count messages to matching listeners', async () => {
     const { wsManager, messageMocks } = await loadManager()
     const onBatchDataUpdate = vi.fn()
@@ -175,7 +223,7 @@ describe('utils/websocket.ts', () => {
       data: JSON.stringify({
         id: 'msg-2',
         type: 'data_batch',
-        timestamp: '2026-04-14T00:00:00.000Z',
+        timestamp: 1776124800,
         data: { rule_id: 7, execution_path: [{ id: 'start' }] },
       }),
     } as MessageEvent)
@@ -183,7 +231,7 @@ describe('utils/websocket.ts', () => {
       data: JSON.stringify({
         id: 'msg-3',
         type: 'alarm',
-        timestamp: '2026-04-14T00:00:01.000Z',
+        timestamp: 1776124801,
         data: { alarm_id: 'a-1', message: 'overheat' },
       }),
     } as MessageEvent)
@@ -191,7 +239,7 @@ describe('utils/websocket.ts', () => {
       data: JSON.stringify({
         id: 'msg-4',
         type: 'error',
-        timestamp: '2026-04-14T00:00:02.000Z',
+        timestamp: 1776124802,
         data: { code: 'E_1', message: 'server error' },
       }),
     } as MessageEvent)
@@ -199,14 +247,14 @@ describe('utils/websocket.ts', () => {
       data: JSON.stringify({
         id: 'msg-5',
         type: 'alarm_num',
-        timestamp: '2026-04-14T00:00:03.000Z',
+        timestamp: 1776124803,
         data: { current_alarms: 3 },
       }),
     } as MessageEvent)
 
     expect(onBatchDataUpdate).toHaveBeenCalledWith(
       { rule_id: 7, execution_path: [{ id: 'start' }] },
-      '2026-04-14T00:00:00.000Z',
+      1776124800,
     )
     expect(onAlarm).toHaveBeenCalledWith({ alarm_id: 'a-1', message: 'overheat' })
     expect(onError).toHaveBeenCalledWith({ code: 'E_1', message: 'server error' })

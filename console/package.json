@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:type-check": "run-p type-check \"build-only {@}\" --",
+    "build:type-check": "run-p type-check build",
     "build:check": "vite build",
     "preview": "vite preview",
     "test:unit": "vitest",
@@ -22,7 +22,7 @@
     "quality:report": "node scripts/quality-report.mjs",
     "quality:check": "node scripts/quality-report.mjs --out reports/quality/quality-report.md",
     "type-check": "vue-tsc --build",
-    "type-check:only": "vue-tsc --noEmit",
+    "type-check:only": "pnpm run type-check",
     "lint": "eslint . --fix",
     "lint:check": "eslint . --max-warnings=0",
     "format": "prettier --write src/",

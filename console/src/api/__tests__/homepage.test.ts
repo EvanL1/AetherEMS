@@ -9,7 +9,12 @@ vi.mock('@/utils/request', () => ({
 
 describe('api/homepage.ts', () => {
   it('gets homepage points with the default limit', async () => {
-    const mockData = { success: true, data: { items: [], total: 0 } }
+    const mockData = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { items: [], total: 0 },
+    }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.get).mockResolvedValue(mockData)
 
@@ -20,7 +25,12 @@ describe('api/homepage.ts', () => {
   })
 
   it('gets homepage points with a custom limit', async () => {
-    const mockData = { success: true, data: { items: [{ id: 1 }], total: 1 } }
+    const mockData = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { items: [{ id: 1 }], total: 1 },
+    }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.get).mockResolvedValue(mockData)
 

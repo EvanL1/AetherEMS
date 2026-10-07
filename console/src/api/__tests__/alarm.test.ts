@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
+import type { RuleFormModel } from '@/types/ruleManagement'
 import {
   getRuleDetail,
   createRule,
@@ -46,7 +47,17 @@ describe('Alarm API', () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
-    const ruleData = { name: 'new rule', condition: 'test' }
+    const ruleData: RuleFormModel = {
+      rule_name: 'new rule',
+      service_type: 'comsrv',
+      channel_id: 1,
+      point_id: 1,
+      data_type: 'T',
+      warning_level: 1,
+      operator: '>',
+      value: 30,
+      enabled: false,
+    }
     const result = await createRule(ruleData, { confirmed: true })
     expect(result).toEqual(mockData)
     expect(Request.post).toHaveBeenCalledWith('/api/v1/alarm/rules', ruleData, {

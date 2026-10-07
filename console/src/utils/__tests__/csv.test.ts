@@ -1,19 +1,28 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type Mock,
+  type MockInstance,
+} from 'vitest'
 
 describe('downloadCsv', () => {
-  let createObjectURLMock: ReturnType<typeof vi.fn>
-  let revokeObjectURLMock: ReturnType<typeof vi.fn>
-  let appendChildMock: ReturnType<typeof vi.fn>
-  let removeChildMock: ReturnType<typeof vi.fn>
-  let clickMock: ReturnType<typeof vi.fn>
+  let createObjectURLMock: Mock<typeof URL.createObjectURL>
+  let revokeObjectURLMock: Mock<typeof URL.revokeObjectURL>
+  let appendChildMock: MockInstance<typeof document.body.appendChild>
+  let removeChildMock: MockInstance<typeof document.body.removeChild>
+  let clickMock: Mock<HTMLAnchorElement['click']>
   let createdLink: HTMLAnchorElement
   let capturedBlobContent: string
 
   beforeEach(() => {
     capturedBlobContent = ''
-    createObjectURLMock = vi.fn(() => 'blob:mock-url')
-    revokeObjectURLMock = vi.fn()
-    clickMock = vi.fn()
+    createObjectURLMock = vi.fn<typeof URL.createObjectURL>(() => 'blob:mock-url')
+    revokeObjectURLMock = vi.fn<typeof URL.revokeObjectURL>()
+    clickMock = vi.fn<HTMLAnchorElement['click']>()
 
     // Capture the blob content with a constructable replacement.
     const OriginalBlob = global.Blob
@@ -32,12 +41,13 @@ describe('downloadCsv', () => {
 
     createdLink = document.createElement('a')
     vi.spyOn(createdLink, 'click').mockImplementation(clickMock)
-    appendChildMock = vi.spyOn(document.body, 'appendChild').mockReturnValue(createdLink as any)
-    removeChildMock = vi.spyOn(document.body, 'removeChild').mockReturnValue(createdLink as any)
+    appendChildMock = vi.spyOn(document.body, 'appendChild')
+    removeChildMock = vi.spyOn(document.body, 'removeChild')
 
+    const createElement = document.createElement.bind(document)
     vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
       if (tag === 'a') return createdLink
-      return document.createElement(tag)
+      return createElement(tag)
     })
   })
 

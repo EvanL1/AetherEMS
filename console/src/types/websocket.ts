@@ -3,12 +3,17 @@
  * 基于提供的WebSocket数据交互结构
  */
 
-// 基础报文结构
+// 服务端报文时间戳是 Unix 秒数。
 export interface WebSocketMessage {
   id: string // 新增：唯一标识字段
   type: string
-  timestamp: string
+  timestamp: number
   data?: any
+}
+
+// 客户端保持现有的 ISO 时间戳格式。
+interface ClientWebSocketMessage extends Omit<WebSocketMessage, 'timestamp'> {
+  timestamp: string
 }
 
 // 客户端发送报文类型
@@ -38,7 +43,7 @@ export type AlarmStatus = 0 | 1 // 0=恢复, 1=触发
 // 客户端发送报文接口
 
 // 订阅数据
-export interface SubscribeMessage extends WebSocketMessage {
+export interface SubscribeMessage extends ClientWebSocketMessage {
   type: 'subscribe'
   data:
     | {
@@ -59,7 +64,7 @@ export interface SubscribeMessage extends WebSocketMessage {
 }
 
 // 取消订阅
-export interface UnsubscribeMessage extends WebSocketMessage {
+export interface UnsubscribeMessage extends ClientWebSocketMessage {
   type: 'unsubscribe'
   data:
     | {
@@ -76,7 +81,7 @@ export interface UnsubscribeMessage extends WebSocketMessage {
 }
 
 // 心跳
-export interface PingMessage extends WebSocketMessage {
+export interface PingMessage extends ClientWebSocketMessage {
   type: 'ping'
 }
 
@@ -168,8 +173,7 @@ export interface ErrorMessage extends WebSocketMessage {
 export interface PongMessage extends WebSocketMessage {
   type: 'pong'
   data: {
-    server_time: string
-    latency: number
+    latency_ms: number
   }
 }
 
@@ -185,8 +189,6 @@ export interface AlarmNumMessage extends WebSocketMessage {
 /** homepage_batch：首页点位批量推送 */
 export interface HomepageBatchMessage extends WebSocketMessage {
   type: 'homepage_batch'
-  id: string
-  timestamp: number
   data: {
     updates: Array<{
       id: number
@@ -224,7 +226,7 @@ export interface SubscriptionConfig {
 
 // 数据监听器类型
 export type DataListener = (data: DataUpdateMessage['data']) => void
-export type BatchDataListener = (data: DataBatchMessage['data'], timestamp?: string) => void
+export type BatchDataListener = (data: DataBatchMessage['data'], timestamp?: number) => void
 export type AlarmListener = (alarm: AlarmMessage['data']) => void
 export type ErrorListener = (error: ErrorMessage['data']) => void
 export type AlarmNumListener = (alarmNum: AlarmNumMessage['data']) => void

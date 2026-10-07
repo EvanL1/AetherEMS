@@ -17,7 +17,12 @@ vi.mock('@/utils/request', () => ({
 
 describe('System API', () => {
   it('should get MQTT config', async () => {
-    const mockData = { mqtt_connection: { broker: {} } }
+    const mockData = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { mqtt_connection: { broker: {} } },
+    }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.get).mockResolvedValue(mockData)
 
@@ -27,7 +32,7 @@ describe('System API', () => {
   })
 
   it('should update MQTT config', async () => {
-    const mockData = { success: true }
+    const mockData = { code: 200, message: 'OK', success: true, data: null }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
@@ -40,7 +45,12 @@ describe('System API', () => {
   })
 
   it('should disconnect MQTT', async () => {
-    const mockData = { status: 'disconnected' }
+    const mockData = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { status: 'disconnected' },
+    }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
@@ -52,7 +62,12 @@ describe('System API', () => {
   })
 
   it('should reconnect MQTT', async () => {
-    const mockData = { status: 'connected' }
+    const mockData = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { status: 'connected' },
+    }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.post).mockResolvedValue(mockData)
 
@@ -64,7 +79,12 @@ describe('System API', () => {
   })
 
   it('should get MQTT status', async () => {
-    const mockData = { connected: true }
+    const mockData = {
+      code: 200,
+      message: 'OK',
+      success: true,
+      data: { connected: true },
+    }
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.get).mockResolvedValue(mockData)
 
