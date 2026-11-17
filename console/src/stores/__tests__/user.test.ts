@@ -54,7 +54,7 @@ describe('stores/user.ts', () => {
 
     expect(store.isLoggedIn).toBe(false)
     expect(store.displayName).toBe('')
-    expect(store.roles).toEqual(['Admin'])
+    expect(store.roles).toEqual([])
 
     store.token = 'access-token'
     store.userInfo = userInfo
@@ -62,6 +62,17 @@ describe('stores/user.ts', () => {
     expect(store.isLoggedIn).toBe(true)
     expect(store.displayName).toBe('operator')
     expect(store.roles).toEqual(['Engineer'])
+  })
+
+  it.each([
+    ['has no role', { ...userInfo, role: undefined }],
+    ['has an unnamed role', { ...userInfo, role: { ...userInfo.role, name_en: '' } }],
+  ])('grants no role when the profile %s', (_case, profile) => {
+    const store = useUserStore()
+    store.token = 'access-token'
+    store.userInfo = profile as UserInfo
+
+    expect(store.roles).toEqual([])
   })
 
   it('hashes the password and stores tokens after a successful login', async () => {

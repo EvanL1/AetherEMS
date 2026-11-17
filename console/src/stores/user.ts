@@ -18,9 +18,10 @@ export const useUserStore = defineStore(
     const isLoggedIn = computed(() => !!token.value && !!userInfo.value)
     const displayName = computed(() => userInfo.value?.username || '')
 
-    const roles = computed(() =>
-      userInfo.value?.role.name_en ? [userInfo.value.role.name_en] : ['Admin'],
-    )
+    const roles = computed(() => {
+      const role = userInfo.value?.role?.name_en
+      return role ? [role] : []
+    })
 
     // 用户登录
     const login = async (params: LoginParams) => {
