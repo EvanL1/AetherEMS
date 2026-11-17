@@ -135,10 +135,23 @@ describe('User API', () => {
     const { Request } = await import('@/utils/request')
     vi.mocked(Request.put).mockResolvedValue(mockData)
 
-    const userData = { username: 'updated' }
+    const userData = { role_id: 2, is_active: false }
     const result = await userApi.updateUser(1, userData)
     expect(result).toEqual(mockData)
     expect(Request.put).toHaveBeenCalledWith('/api/v1/auth/users/1', userData)
+  })
+
+  it('sends only the fields the gateway user update applies', async () => {
+    const { Request } = await import('@/utils/request')
+    vi.mocked(Request.put).mockClear()
+    vi.mocked(Request.put).mockResolvedValue({ code: 200, message: 'OK', success: true, data: {} })
+
+    const formState = { role_id: 3, is_active: true, username: 'renamed', password: 'new-password' }
+    await userApi.updateUser(1, formState)
+
+    const [, payload] = vi.mocked(Request.put).mock.calls[0]
+    expect(Object.keys(payload).sort()).toEqual(['is_active', 'role_id'])
+    expect(payload).toEqual({ role_id: 3, is_active: true })
   })
 
   it('should delete user', async () => {

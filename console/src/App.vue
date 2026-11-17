@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, nextTick } from 'vue'
+import { h, watch } from 'vue'
 import { ElNotification } from 'element-plus'
 import en from 'element-plus/es/locale/lang/en'
 import wsManager from '@/utils/websocket'
@@ -20,7 +20,6 @@ const handleAlarmDetail = () => {
   router.push({ name: 'alarmCurrentRecords' })
 }
 
-let idCount = 0
 const alarmMap = new Map()
 
 const initWebSocket = async () => {
@@ -40,44 +39,28 @@ const initWebSocket = async () => {
       },
       onAlarm: (alarm) => {
         if (alarm.status == 1) {
-          const currentId = idCount++
           const notification = ElNotification({
             title: 'Alarm',
             type: 'error',
             customClass: 'alarm-notification alarm-notification--error',
             showClose: true,
-            dangerouslyUseHTMLString: true,
-            message: `
-              <div class="alarm-notification-content">
-                <span class="alarm-notification-msg">${alarm.message}</span>
-                <div class="alarm-notification-footer">
-                  <button id="to-detail-btn-${currentId}" class="alarm-detail-btn">to detail</button>
-                </div>
-              </div>
-            `,
+            message: h('div', { class: 'alarm-notification-content' }, [
+              h('span', { class: 'alarm-notification-msg' }, alarm.message),
+              h('div', { class: 'alarm-notification-footer' }, [
+                h(
+                  'button',
+                  { type: 'button', class: 'alarm-detail-btn', onClick: handleAlarmDetail },
+                  'to detail',
+                ),
+              ]),
+            ]),
             duration: 0,
             onClose: () => {
-              const buttonId = `to-detail-btn-${currentId}`
-              const eventInfo = document.getElementById(buttonId)
-
-              if (eventInfo) {
-                eventInfo.removeEventListener('click', handleAlarmDetail)
-                console.log(`[App] cleaned alarm button listener: ${buttonId}`)
-              }
-
               alarmMap.delete(alarm.alarm_id)
             },
           })
 
           alarmMap.set(alarm.alarm_id, notification)
-
-          nextTick(() => {
-            const buttonId = `to-detail-btn-${currentId}`
-            const btn = document.getElementById(buttonId)
-            if (btn) {
-              btn.addEventListener('click', handleAlarmDetail)
-            }
-          })
         } else {
           ElNotification.success({
             title: 'Alarm Recovered',

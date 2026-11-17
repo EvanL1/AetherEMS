@@ -18,9 +18,10 @@ export const useUserStore = defineStore(
     const isLoggedIn = computed(() => !!token.value && !!userInfo.value)
     const displayName = computed(() => userInfo.value?.username || '')
 
-    const roles = computed(() =>
-      userInfo.value?.role.name_en ? [userInfo.value.role.name_en] : ['Admin'],
-    )
+    const roles = computed(() => {
+      const role = userInfo.value?.role?.name_en
+      return role ? [role] : []
+    })
 
     // 用户登录
     const login = async (params: LoginParams) => {
@@ -50,18 +51,18 @@ export const useUserStore = defineStore(
     // 用户登出
     const logout = async () => {
       try {
-        // 调用登出API
-        if (token.value) {
+        if (refreshToken.value) {
           const res = await userApi.logout(refreshToken.value)
           if (res.success) {
             ElMessage.success('Logout successful')
-            clearUserData()
           } else {
             ElMessage.error(res.message || 'Logout failed')
           }
         }
       } catch (error) {
-        console.error('Logout API call failed:', error)
+        console.error('Logout API call failed:', (error as Error)?.message)
+      } finally {
+        clearUserData()
       }
     }
 

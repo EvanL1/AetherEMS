@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useUserStore } from '@/stores/user'
+import type { RouteItem } from '@/types/menu'
+import type { UserInfo } from '@/types/user'
+import { dynamicRoutes } from '../dynamic-routes'
 import { router } from '../index'
 import { ensureRoutesInjected, getFilteredRoutesForSidebar, resetDynamicRoutes } from '../injector'
 
@@ -45,4 +48,30 @@ describe('operator navigation', () => {
       expect(router.hasRoute('controlManagement')).toBe(false)
     },
   )
+
+  it.each([
+    ['is not loaded', null],
+    [
+      'has no role',
+      { id: 1, username: 'operator', is_active: true, role: undefined } as unknown as UserInfo,
+    ],
+  ])('grants no role-gated route when the profile %s', async (_case, profile) => {
+    const user = useUserStore()
+    user.userInfo = profile
+
+    expect(getFilteredRoutesForSidebar().filter((route) => route.meta?.roles)).toEqual([])
+
+    await ensureRoutesInjected()
+
+    const roleGatedNames = (routes: RouteItem[]): string[] =>
+      routes.flatMap((route) => [
+        ...(route.meta?.roles ? [route.name] : []),
+        ...roleGatedNames(route.children ?? []),
+      ])
+    const reachable = roleGatedNames(dynamicRoutes).filter((name) => router.hasRoute(name))
+
+    expect(roleGatedNames(dynamicRoutes)).toContain('ruleManagement')
+    expect(reachable).toEqual([])
+    expect(user.routesInjected).toBe(true)
+  })
 })
