@@ -50,18 +50,18 @@ export const useUserStore = defineStore(
     // 用户登出
     const logout = async () => {
       try {
-        // 调用登出API
-        if (token.value) {
+        if (refreshToken.value) {
           const res = await userApi.logout(refreshToken.value)
           if (res.success) {
             ElMessage.success('Logout successful')
-            clearUserData()
           } else {
             ElMessage.error(res.message || 'Logout failed')
           }
         }
       } catch (error) {
-        console.error('Logout API call failed:', error)
+        console.error('Logout API call failed:', (error as Error)?.message)
+      } finally {
+        clearUserData()
       }
     }
 

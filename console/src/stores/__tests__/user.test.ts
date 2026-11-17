@@ -181,24 +181,64 @@ describe('stores/user.ts', () => {
     expect(store.routesInjected).toBe(false)
   })
 
-  it('preserves the session when logout is rejected or unavailable', async () => {
+  it.each([
+    [
+      'the gateway rejects the logout',
+      () => mocks.logout.mockResolvedValueOnce({ success: false, message: '' }),
+    ],
+    [
+      'the logout request fails',
+      () => mocks.logout.mockRejectedValueOnce(new Error('logout unavailable')),
+    ],
+  ])('clears every local credential when %s', async (_case, arrangeLogout) => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
     const store = useUserStore()
     store.token = 'access-token'
     store.refreshToken = 'refresh-token'
-    mocks.logout.mockResolvedValueOnce({ success: false, message: '' })
+    store.userInfo = userInfo
+    store.routesInjected = true
+    arrangeLogout()
 
+    await store.logout()
+
+    expect(mocks.logout).toHaveBeenCalledWith('refresh-token')
+    expect(store.token).toBe('')
+    expect(store.refreshToken).toBe('')
+    expect(store.userInfo).toBeNull()
+    expect(store.routesInjected).toBe(false)
+  })
+
+  it('reports a rejected logout and logs a failed one without the request details', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const store = useUserStore()
+
+    store.refreshToken = 'refresh-token'
+    mocks.logout.mockResolvedValueOnce({ success: false, message: '' })
     await store.logout()
     expect(mocks.messageError).toHaveBeenCalledWith('Logout failed')
-    expect(store.token).toBe('access-token')
 
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    store.refreshToken = 'refresh-token'
     mocks.logout.mockRejectedValueOnce(new Error('logout unavailable'))
     await store.logout()
-    expect(consoleError).toHaveBeenCalledWith('Logout API call failed:', expect.any(Error))
-    expect(store.token).toBe('access-token')
+    expect(consoleError).toHaveBeenCalledWith('Logout API call failed:', 'logout unavailable')
+  })
 
-    store.clearUserData()
+  it('revokes a held refresh token even without an access token', async () => {
+    mocks.logout.mockResolvedValue({ success: true })
+    const store = useUserStore()
+    store.refreshToken = 'refresh-token'
+
     await store.logout()
-    expect(mocks.logout).toHaveBeenCalledTimes(2)
+
+    expect(mocks.logout).toHaveBeenCalledWith('refresh-token')
+    expect(store.refreshToken).toBe('')
+  })
+
+  it('skips the logout request when no refresh token is held', async () => {
+    const store = useUserStore()
+
+    await store.logout()
+
+    expect(mocks.logout).not.toHaveBeenCalled()
   })
 })
