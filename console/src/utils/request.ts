@@ -217,12 +217,11 @@ const requestInterceptor = (config: any) => {
     }
   }
 
-  console.log(`[请求] ${config.method?.toUpperCase()} ${config.url}`, config)
   return config
 }
 
 const requestErrorInterceptor = (error: any) => {
-  console.error('[请求错误]', error)
+  console.error('[请求错误]', error?.message)
   // 如果错误对象有 config，尝试清除 pendingRequests
   const requestErrorConfig = error.config as any
   if (error.config?._requestKey && !requestErrorConfig?.skipGlobalLoading) {
@@ -276,14 +275,8 @@ const createResponseInterceptor = (serviceInstance: any, logPrefix: string = '')
       updateGlobalLoading()
     }
 
-    console.log(
-      `${logPrefix}[响应] ${response.config.method?.toUpperCase()} ${response.config.url}`,
-      response,
-    )
-
     const { data } = response
     const customConfig = response.config as any
-    console.log(data)
 
     // 检查业务状态码
     // 如果返回的是blob类型，直接认为请求成功，否则判断业务code或success
@@ -361,7 +354,7 @@ const createResponseInterceptor = (serviceInstance: any, logPrefix: string = '')
       updateGlobalLoading()
     }
 
-    console.error(`${logPrefix}[响应错误]`, error)
+    console.error(`${logPrefix}[响应错误]`, error?.message)
 
     const originalRequest = error.config
     const requestConfig = originalRequest as any
@@ -609,7 +602,6 @@ class Request {
         params,
         responseType: 'blob',
       })
-      console.log('response', response)
       // 创建blob链接
       const blob = new Blob([response.data])
       const downloadUrl = window.URL.createObjectURL(blob)
@@ -629,7 +621,7 @@ class Request {
 
       ElMessage.success('File downloaded successfully')
     } catch (error) {
-      console.error('File download failed:', error)
+      console.error('File download failed:', (error as Error)?.message)
       ElMessage.error('File download failed')
     }
   }
