@@ -12,6 +12,7 @@ export default defineConfig(async (env) => {
         environment: 'jsdom',
         exclude: [...configDefaults.exclude, 'e2e/**'],
         root: fileURLToPath(new URL('./', import.meta.url)),
+        server: { deps: { inline: [/element-plus\/es\/components\/[^/]+\/style\//] } },
         coverage: {
           provider: 'v8',
           reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],

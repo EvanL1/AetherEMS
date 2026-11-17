@@ -85,7 +85,8 @@ export const userApi = {
    * @returns 更新响应
    */
   updateUser(userId: number, params: UpdateUserParams): Promise<ApiResponse<UserInfo>> {
-    return Request.put(`/api/v1/auth/users/${userId}`, params)
+    const { role_id, is_active } = params
+    return Request.put(`/api/v1/auth/users/${userId}`, { role_id, is_active })
   },
   /**
    * 删除用户

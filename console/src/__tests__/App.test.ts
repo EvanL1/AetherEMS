@@ -36,8 +36,6 @@ vi.mock('vue-router', () => ({ useRouter: () => ({ push: mocks.push }) }))
 vi.mock('element-plus', mocks.elementPlus)
 vi.mock('element-plus/es', mocks.elementPlus)
 vi.mock('element-plus/es/locale/lang/en', () => ({ default: {} }))
-vi.mock('element-plus/es/components/base/style/css', () => ({}))
-vi.mock('element-plus/es/components/config-provider/style/css', () => ({}))
 vi.mock('@/components/common/AppSkeleton.vue', () => ({ default: { template: '<div />' } }))
 
 const hostilePayload = '<img src=x onerror="window.__alarmPayloadRan = true">Overvoltage'

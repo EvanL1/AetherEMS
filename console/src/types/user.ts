@@ -58,7 +58,6 @@ export interface RegisterParams {
 
 // 更新用户信息参数
 export interface UpdateUserParams {
-  username?: string
   is_active?: boolean
   role_id?: number
 }
